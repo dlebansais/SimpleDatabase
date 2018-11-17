@@ -1,16 +1,15 @@
-﻿using System.Resources;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SimpleDatabase")]
-[assembly: AssemblyDescription("A C# layer over MySql for basic operations")]
+[assembly: AssemblyTitle("TestDebug")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SimpleDatabase")]
+[assembly: AssemblyProduct("TestDebug")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -21,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("66a14741-d7b3-4107-b36f-966a23ecf930")]
+[assembly: Guid("2abe7a51-7bf0-4b9d-9f87-98063f4f37cb")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,6 +33,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.4.0.8")]
-[assembly: AssemblyFileVersion("1.4.0.7")]
-[assembly: NeutralResourcesLanguage("en-US")]
-
+[assembly: AssemblyFileVersion("1.0.0.1")]
