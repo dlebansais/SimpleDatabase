@@ -3,6 +3,7 @@ solution: SimpleDatabase.sln
 
 install:
 - nuget restore SimpleDatabase.sln
+- nuget install MySQL
 - nuget install NUnit -Version 3.8.1 -OutputDirectory testrunner
 - nuget install NUnit.ConsoleRunner -Version 3.7.0 -OutputDirectory testrunner
 - nuget install DeepEqual -Version 1.6.0 -OutputDirectory testrunner
