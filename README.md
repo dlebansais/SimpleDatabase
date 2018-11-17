@@ -7,4 +7,7 @@ TODO:
 # Simple Database
 A C# layer over MySql for basic operations. Strongly typed, async, nothrow.
 
+![Build Status](https://img.shields.io/travis/dlebansais/SimpleDatabase/master.svg)
+
+
 
