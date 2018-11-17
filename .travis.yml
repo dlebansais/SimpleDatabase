@@ -1,0 +1,24 @@
+language: csharp
+solution: SimpleDatabase.sln
+
+install:
+- nuget restore SimpleDatabase.sln
+- nuget install NUnit -Version 3.8.1 -OutputDirectory testrunner
+- nuget install NUnit.ConsoleRunner -Version 3.7.0 -OutputDirectory testrunner
+- nuget install DeepEqual -Version 1.6.0 -OutputDirectory testrunner
+
+script:
+- msbuild /p:Configuration=Travis SimpleDatabase.sln
+- cp ./testrunner/NUnit.3.8.1/lib/net45/nunit.framework.dll ./SimpleDatabase/bin/x64/Travis/
+- cp ./testrunner/DeepEqual.1.6.0.0/lib/net40/DeepEqual.dll ./SimpleDatabase/bin/x64/Travis/
+- mono ./testrunner/NUnit.ConsoleRunner.3.7.0/tools/nunit3-console.exe --trace=Debug --labels=All ./SimpleDatabase/bin/x64/Travis/Test-SimpleDatabase.dll
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: ./SimpleDatabase/bin/x64/Travis
+  target_branch: gh-pages
+  email: "github-pages-deploy@travis-ci.org"
+  on:
+    branch: master
