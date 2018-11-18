@@ -92,14 +92,23 @@ namespace Database.Internal
                     RootConnection.Open();
                     ReadServerVersion(RootConnection);
 
-                    CommandString = $"SELECT 1 FROM mysql.user WHERE user = '{credential.UserId}';";
-                    TraceCommand(CommandString);
-
-                    if (!ExecuteQuery(RootConnection, CommandString, out int UserCount) || UserCount == 0)
+                    if (ServerVersionMajor >= 8)
                     {
-                        CommandString = $"CREATE USER '{credential.UserId}'@'{credential.Server}' IDENTIFIED BY '{credential.Password}';";
+                        CommandString = $"CREATE USER IF NOT EXISTS '{credential.UserId}'@'{credential.Server}' IDENTIFIED BY '{credential.Password}';";
                         TraceCommand(CommandString);
                         Success &= ExecuteCommand(RootConnection, CommandString);
+                    }
+                    else
+                    {
+                        CommandString = $"SELECT 1 FROM mysql.user WHERE user = '{credential.UserId}';";
+                        TraceCommand(CommandString);
+
+                        if (!ExecuteQuery(RootConnection, CommandString, out int UserCount) || UserCount == 0)
+                        {
+                            CommandString = $"CREATE USER '{credential.UserId}'@'{credential.Server}' IDENTIFIED BY '{credential.Password}';";
+                            TraceCommand(CommandString);
+                            Success &= ExecuteCommand(RootConnection, CommandString);
+                        }
                     }
 
                     CommandString = $"CREATE DATABASE IF NOT EXISTS {credential.Schema.Name} DEFAULT CHARACTER SET utf8;";
@@ -202,9 +211,9 @@ namespace Database.Internal
 
             return Result;
         }
-        #endregion
+#endregion
 
-        #region Schema
+#region Schema
         public override bool CreateTables(ICredential credential)
         {
             string ConnectionString;
@@ -310,9 +319,9 @@ namespace Database.Internal
                 TraceMySqlException(e);
             }
         }
-        #endregion
+#endregion
 
-        #region Open
+#region Open
         public override bool IsOpen { get { return Connection != null && Connection.State == ConnectionState.Open; } }
 
         public override bool Open(ICredential credential)
@@ -351,9 +360,9 @@ namespace Database.Internal
                 return false;
             }
         }
-        #endregion
+#endregion
 
-        #region Single Query
+#region Single Query
         public override IActiveOperation<ISingleQueryResultInternal> SingleQuery(ISingleQueryContext context)
         {
             IMySqlSingleQueryOperation Operation = new MySqlSingleQueryOperation(context);
@@ -362,9 +371,9 @@ namespace Database.Internal
                 (ISingleQueryOperation operation, IAsyncResult asyncResult) => new SingleQueryResult(operation, asyncResult),
                 (MySqlCommand command, ISingleQueryResultInternal result) => Operation.FinalizeOperation(command, result));
         }
-        #endregion
+#endregion
 
-        #region Multi Query
+#region Multi Query
         public override IActiveOperation<IMultiQueryResultInternal> MultiQuery(IMultiQueryContext context)
         {
             IMySqlMultiQueryOperation Operation = new MySqlMultiQueryOperation(context);
@@ -373,9 +382,9 @@ namespace Database.Internal
                 (IMultiQueryOperation operation, IAsyncResult asyncResult) => new MultiQueryResult(operation, asyncResult),
                 (MySqlCommand command, IMultiQueryResultInternal result) => Operation.FinalizeOperation(command, result));
         }
-        #endregion
+#endregion
 
-        #region Update
+#region Update
         public override IActiveOperation<IUpdateResultInternal> Update(IUpdateContext context)
         {
             IMySqlUpdateOperation Operation = new MySqlUpdateOperation(context);
@@ -385,9 +394,9 @@ namespace Database.Internal
                 (IUpdateOperation operation, IAsyncResult asyncResult) => new UpdateResult(operation, asyncResult),
                 (MySqlCommand command, IUpdateResultInternal result) => Operation.FinalizeOperation(command, result));
         }
-        #endregion
+#endregion
 
-        #region Single Insert
+#region Single Insert
         public override IActiveOperation<ISingleInsertResultInternal> SingleInsert(ISingleInsertContext context)
         {
             IMySqlSingleInsertOperation Operation = new MySqlSingleInsertOperation(context);
@@ -397,9 +406,9 @@ namespace Database.Internal
                 (ISingleInsertOperation operation, IAsyncResult asyncResult) => new SingleInsertResult(operation, asyncResult),
                 (MySqlCommand command, ISingleInsertResultInternal result) => Operation.FinalizeOperation(command, result));
         }
-        #endregion
+#endregion
 
-        #region Multi Insert
+#region Multi Insert
         public override IActiveOperation<IMultiInsertResultInternal> MultiInsert(IMultiInsertContext context)
         {
             IMySqlMultiInsertOperation Operation = new MySqlMultiInsertOperation(context);
@@ -408,9 +417,9 @@ namespace Database.Internal
                 (IMultiInsertOperation operation, IAsyncResult asyncResult) => new MultiInsertResult(operation, asyncResult),
                 (MySqlCommand command, IMultiInsertResultInternal result) => Operation.FinalizeOperation(command, result));
         }
-        #endregion
+#endregion
 
-        #region Single Row Delete
+#region Single Row Delete
         public override IActiveOperation<ISingleRowDeleteResultInternal> SingleRowDelete(ISingleRowDeleteContext context)
         {
             IMySqlSingleRowDeleteOperation Operation = new MySqlSingleRowDeleteOperation(context);
@@ -418,9 +427,9 @@ namespace Database.Internal
                 Operation, (ISingleRowDeleteOperation operation, IAsyncResult asyncResult) => new SingleRowDeleteResult(operation, asyncResult),
                 (MySqlCommand command, ISingleRowDeleteResultInternal result) => Operation.FinalizeOperation(command, result));
         }
-        #endregion
+#endregion
 
-        #region Multi Row Delete
+#region Multi Row Delete
         public override IActiveOperation<IMultiRowDeleteResultInternal> MultiRowDelete(IMultiRowDeleteContext context)
         {
             IMySqlMultiRowDeleteOperation Operation = new MySqlMultiRowDeleteOperation(context);
@@ -428,9 +437,9 @@ namespace Database.Internal
                 Operation, (IMultiRowDeleteOperation operation, IAsyncResult asyncResult) => new MultiRowDeleteResult(operation, asyncResult),
                 (MySqlCommand command, IMultiRowDeleteResultInternal result) => Operation.FinalizeOperation(command, result));
         }
-        #endregion
+#endregion
 
-        #region Operations
+#region Operations
         protected virtual IActiveOperation<TInternal> PrepareReaderOperation<TContext, TMySqlOperation, TOperation, TResult, TInternal>(TMySqlOperation operation, Func<TOperation, IAsyncResult, TInternal> createResultHandler, Func<MySqlCommand, TInternal, string> finalizer)
             where TContext : IQueryContext
             where TMySqlOperation : IMySqlQueryOperation<TContext, TInternal>, TOperation
@@ -625,6 +634,8 @@ namespace Database.Internal
 
         private Dictionary<IMySqlActiveOperation, MySqlCommand> ActiveOperationTable;
         private static string ServerVersion;
+        private static int ServerVersionMajor;
+        private static int ServerVersionMinor;
         #endregion
 
         #region Close
@@ -646,9 +657,9 @@ namespace Database.Internal
                 TraceMySqlException(e);
             }
         }
-        #endregion
+#endregion
 
-        #region Initialization
+#region Initialization
         public static void ReadServerVersion(MySqlConnection rootConnection)
         {
             if (ServerVersion != null)
@@ -666,7 +677,17 @@ namespace Database.Internal
                         {
                             string s = Reader["VERSION()"] as string;
                             if (!string.IsNullOrEmpty(s))
+                            {
                                 ServerVersion = s;
+
+                                string[] Splitted = s.Split('.');
+                                if (Splitted.Length >= 2 && int.TryParse(Splitted[0], out int Major) && int.TryParse(Splitted[1], out int Minor))
+                                {
+                                    ServerVersionMajor = Major;
+                                    ServerVersionMinor= Minor;
+                                    ServerVersion = $"[{Major}.{Minor}] {ServerVersion}";
+                                }
+                            }
                         }
                     }
                 }
@@ -806,6 +827,6 @@ namespace Database.Internal
                 ExecuteCommand(RootConnection, CommandString);
             }
         }
-        #endregion
+#endregion
     }
 }
