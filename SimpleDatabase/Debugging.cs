@@ -13,7 +13,11 @@ namespace Database.Internal
 #if DEBUG
             Debug.Print(s);
 #else
+#if TRACE
+            Debug.Print(s);
+#else
             OutputDebugString(s);
+#endif
 #endif
         }
     }
