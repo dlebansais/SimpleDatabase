@@ -49,10 +49,12 @@ namespace Database.Internal
 
                 Success = true;
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 bool IsValidityError = false;
@@ -88,10 +90,17 @@ namespace Database.Internal
                 using (MySqlConnection RootConnection = new MySqlConnection(ConnectionString))
                 {
                     RootConnection.Open();
+                    ReadServerVersion(RootConnection);
 
-                    CommandString = $"CREATE USER IF NOT EXISTS '{credential.UserId}'@'{credential.Server}' IDENTIFIED BY '{credential.Password}';";
+                    CommandString = $"SELECT 1 FROM mysql.user WHERE user = '{credential.UserId}';";
                     TraceCommand(CommandString);
-                    Success &= ExecuteCommand(RootConnection, CommandString);
+
+                    if (!ExecuteQuery(RootConnection, CommandString, out int UserCount) || UserCount == 0)
+                    {
+                        CommandString = $"CREATE USER IF NOT EXISTS '{credential.UserId}'@'{credential.Server}' IDENTIFIED BY '{credential.Password}';";
+                        TraceCommand(CommandString);
+                        Success &= ExecuteCommand(RootConnection, CommandString);
+                    }
 
                     CommandString = $"CREATE DATABASE IF NOT EXISTS {credential.Schema.Name} DEFAULT CHARACTER SET utf8;";
                     TraceCommand(CommandString);
@@ -106,10 +115,12 @@ namespace Database.Internal
 
                 return Success;
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -131,6 +142,7 @@ namespace Database.Internal
                 using (MySqlConnection RootConnection = new MySqlConnection(ConnectionString))
                 {
                     RootConnection.Open();
+                    ReadServerVersion(RootConnection);
 
                     bool IsDatabaseDropped = false;
 
@@ -165,10 +177,12 @@ namespace Database.Internal
                     RootConnection.Close();
                 }
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -203,6 +217,7 @@ namespace Database.Internal
                 using (MySqlConnection RootConnection = new MySqlConnection(ConnectionString))
                 {
                     RootConnection.Open();
+                    ReadServerVersion(RootConnection);
 
                     CommandString = $"CREATE DATABASE IF NOT EXISTS {credential.Schema.Name} DEFAULT CHARACTER SET utf8;";
                     ExecuteCommand(RootConnection, CommandString);
@@ -217,10 +232,12 @@ namespace Database.Internal
 
                 return true;
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -243,6 +260,7 @@ namespace Database.Internal
                 using (MySqlConnection RootConnection = new MySqlConnection(ConnectionString))
                 {
                     RootConnection.Open();
+                    ReadServerVersion(RootConnection);
 
                     CommandString = $"SHOW TABLES IN {credential.Schema.Name};";
                     TraceCommand(CommandString);
@@ -281,10 +299,12 @@ namespace Database.Internal
                     RootConnection.Close();
                 }
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -306,6 +326,8 @@ namespace Database.Internal
 
                 if (IsOpen)
                 {
+                    ReadServerVersion(Connection);
+
                     string CreateCommandString = $"CREATE DATABASE IF NOT EXISTS {credential.Schema.Name} DEFAULT CHARACTER SET utf8;";
                     ExecuteCommand(Connection, CreateCommandString);
 
@@ -317,10 +339,12 @@ namespace Database.Internal
                 else
                     return false;
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -430,10 +454,12 @@ namespace Database.Internal
                 ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult, finalizer);
                 ActiveOperationTable.Add(ActiveOperation, Command);
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -467,10 +493,12 @@ namespace Database.Internal
                 ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult, finalizer);
                 ActiveOperationTable.Add(ActiveOperation, Command);
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -515,10 +543,12 @@ namespace Database.Internal
                 ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult, finalizer);
                 ActiveOperationTable.Add(ActiveOperation, Command);
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -543,10 +573,12 @@ namespace Database.Internal
                         TraceCommandEnd(Command, Diagnostic);
                     }
                 }
-                catch (ApplicationException e)
+#if TRACE
+                catch (ApplicationException)
                 {
                     throw;
                 }
+#endif
                 catch (Exception e)
                 {
                     TraceMySqlException(e);
@@ -573,7 +605,9 @@ namespace Database.Internal
 
         private static void TraceMySqlException(Exception e, [CallerMemberName] string CallerName = "")
         {
-            Debugging.PrintExceptionMessage("MySql exception" + (CallerName.Length > 0 ? " (from " + CallerName + ")" : "") + ": " + e.Message);
+            string CallerNameInfo = (CallerName.Length > 0 ? $" (from {CallerName})" : "");
+            string ServerVersionInfo = (ServerVersion != null ? $", Server Version: {ServerVersion}" : "");
+            Debugging.PrintExceptionMessage($"MySql exception{CallerNameInfo}{ServerVersionInfo}: {e.Message}");
         }
 
         private void StartWatch(out Stopwatch watch)
@@ -590,6 +624,7 @@ namespace Database.Internal
         }
 
         private Dictionary<IMySqlActiveOperation, MySqlCommand> ActiveOperationTable;
+        private static string ServerVersion;
         #endregion
 
         #region Close
@@ -600,10 +635,12 @@ namespace Database.Internal
                 Connection.Close();
                 Connection = null;
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -612,6 +649,33 @@ namespace Database.Internal
         #endregion
 
         #region Initialization
+        public static void ReadServerVersion(MySqlConnection rootConnection)
+        {
+            if (ServerVersion != null)
+                return;
+
+            ServerVersion = "Unknown";
+
+            try
+            {
+                using (MySqlCommand Command = new MySqlCommand("SELECT VERSION()", rootConnection))
+                {
+                    using (MySqlDataReader Reader = Command.ExecuteReader())
+                    {
+                        if (Reader.Read())
+                        {
+                            string s = Reader["VERSION()"] as string;
+                            if (!string.IsNullOrEmpty(s))
+                                ServerVersion = s;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
         private static bool ExecuteCommand(MySqlConnection rootConnection, string commandString)
         {
             return ExecuteCommand(rootConnection, commandString, out int ErrorCode);
@@ -628,10 +692,12 @@ namespace Database.Internal
                     return true;
                 }
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 if (e is MySqlException AsSqlException)
@@ -666,10 +732,12 @@ namespace Database.Internal
                     }
                 }
             }
-            catch (ApplicationException e)
+#if TRACE
+            catch (ApplicationException)
             {
                 throw;
             }
+#endif
             catch (Exception e)
             {
                 if (e is MySqlException AsSqlException)
