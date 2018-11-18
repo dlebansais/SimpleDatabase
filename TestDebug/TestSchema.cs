@@ -5,12 +5,14 @@ namespace TestDebug
 {
     public interface ITestSchema : ISchemaDescriptor
     {
+        ITableDescriptor Test0 { get; }
+        IColumnDescriptorGuid Test0_Guid { get; }
     }
 
     public class TestSchema : SchemaDescriptor, ITestSchema
     {
-        public ITableDescriptor Test0;
-        public IColumnDescriptorGuid Test0_Guid;
+        public ITableDescriptor Test0 { get; }
+        public IColumnDescriptorGuid Test0_Guid { get; }
 
         public TestSchema()
             : base("test")

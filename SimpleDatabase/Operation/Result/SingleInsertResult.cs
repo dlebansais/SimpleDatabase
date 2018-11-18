@@ -54,7 +54,7 @@ namespace Database.Internal
 
         public override void SetCompleted(bool success)
         {
-            Debug.Assert(false);
+            Debug.Assert(!success);
             base.SetCompleted(success);
         }
         #endregion

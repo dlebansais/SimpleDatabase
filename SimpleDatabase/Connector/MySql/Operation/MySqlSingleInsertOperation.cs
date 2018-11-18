@@ -1,5 +1,6 @@
 ﻿using Database.Types;
 using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -37,21 +38,29 @@ namespace Database.Internal
             bool Success;
             string Diagnostic;
 
-            int InsertedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
-            if (InsertedLines > 0)
+            try
             {
-                CreatedKeyId = GetCreatedKeyId(Command, Result);
-                Diagnostic = $"succeeded, {InsertedLines} row(s) inserted";
-                Success = true;
-            }
-            else
-            {
-                Diagnostic = "failed";
-                Success = false;
-            }
+                int InsertedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
+                if (InsertedLines > 0)
+                {
+                    CreatedKeyId = GetCreatedKeyId(Command, Result);
+                    Diagnostic = $"succeeded, {InsertedLines} row(s) inserted";
+                    Success = true;
+                }
+                else
+                {
+                    Diagnostic = "failed";
+                    Success = false;
+                }
 
-            Result.SetCompletedWithId(Success, CreatedKeyId);
-            return Diagnostic;
+                Result.SetCompletedWithId(Success, CreatedKeyId);
+                return Diagnostic;
+            }
+            catch
+            {
+                Result.SetCompleted(false);
+                throw;
+            }
         }
         #endregion
 

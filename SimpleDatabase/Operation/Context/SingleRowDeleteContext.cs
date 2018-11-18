@@ -18,21 +18,6 @@ namespace Database
         #region Init
         /// <summary>
         ///     Initializes a new instance of the <see cref="SingleRowDeleteContext"/> class.
-        ///     This request has no constraints.
-        /// </summary>
-        /// <parameters>
-        /// <param name="table">The table addressed by the request.</param>
-        /// </parameters>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="table"/> is null.
-        /// </exception>
-        public SingleRowDeleteContext(ITableDescriptor table)
-            : base(table)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="SingleRowDeleteContext"/> class.
         ///     This request has a constraint: one column must match one value.
         /// </summary>
         /// <parameters>

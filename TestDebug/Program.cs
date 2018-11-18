@@ -1,4 +1,6 @@
 ﻿using Database;
+using System;
+using System.Collections.Generic;
 
 namespace TestDebug
 {
@@ -16,10 +18,26 @@ namespace TestDebug
             Database.Initialize(ConnectorType.MySql, ConnectionOption.KeepAlive);
 
             ITestSchema TestSchema = new TestSchema();
-            ICredential Credential = new Credential("localhost", "test@localhost", "root", TestSchema);
+            ICredential Credential = new Credential("localhost", "test", "test", TestSchema);
 
-            Database.IsCredentialValid(Credential);
-            Database.CreateCredential(RootId, RootPassword, Credential);
+            bool Success;
+
+            Success = Database.IsCredentialValid(Credential);
+            Success = Database.CreateCredential(RootId, RootPassword, Credential);
+            Success = Database.IsCredentialValid(Credential);
+            Success = Database.CreateTables(Credential);
+            Success = Database.Open(Credential);
+
+            ISingleInsertResult InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<ColumnValuePair<Guid>>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty) }));
+            Success = InsertResult.Success;
+
+            ISingleRowDeleteResult DeleteResult = Database.Run(new SingleRowDeleteContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty)));
+            Success = DeleteResult.Success;
+
+            Database.Close();
+            Database.DeleteTables(Credential);
+            Database.DeleteCredential(RootId, RootPassword, Credential);
+            Success = Database.IsCredentialValid(Credential);
         }
     }
 }

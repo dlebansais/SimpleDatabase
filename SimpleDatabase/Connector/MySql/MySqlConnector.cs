@@ -15,6 +15,13 @@ namespace Database.Internal
 
     internal class MySqlConnector : DatabaseConnector, IMySqlConnector
     {
+        #region Constants
+        private const int ER_DBACCESS_DENIED_ERROR = 1044;
+        private const int ER_ACCESS_DENIED_ERROR = 1045;
+        private const int ER_BAD_DB_ERROR = 1049;
+        private const int ER_CANNOT_USER = 1396;
+        #endregion
+
         #region Init
         public MySqlConnector()
         {
@@ -24,8 +31,155 @@ namespace Database.Internal
         private MySqlConnection Connection;
         #endregion
 
+        #region Credentials
+        public override bool IsCredentialValid(ICredential credential, TimeSpan minDuration)
+        {
+            bool Success;
+            StartWatch(out Stopwatch Watch);
+
+            try
+            {
+                string ConnectionString = CredentialToConnectionString(credential, true);
+
+                using (MySqlConnection VerificationConnection = new MySqlConnection(ConnectionString))
+                {
+                    VerificationConnection.Open();
+                    VerificationConnection.Close();
+                }
+
+                Success = true;
+            }
+            catch (Exception e)
+            {
+                bool IsValidityError = false;
+
+                MySqlException AsMySqlException = e as MySqlException;
+                while (AsMySqlException != null && !IsValidityError)
+                    if (AsMySqlException.Number == ER_DBACCESS_DENIED_ERROR || AsMySqlException.Number == ER_ACCESS_DENIED_ERROR || AsMySqlException.Number == ER_BAD_DB_ERROR)
+                        IsValidityError = true;
+                    else
+                        AsMySqlException = AsMySqlException.InnerException as MySqlException;
+
+                if (!IsValidityError)
+                    TraceMySqlException(e);
+
+                Success = false;
+            }
+
+            MinWait(Watch, minDuration);
+            return Success;
+        }
+
+        public override bool CreateCredential(string rootId, string rootPassword, ICredential credential)
+        {
+            string ConnectionString;
+            string CommandString;
+
+            try
+            {
+                ICredential RootCredential = new Credential(credential.Server, rootId, rootPassword);
+                ConnectionString = CredentialToConnectionString(RootCredential, false);
+                bool Success = true;
+
+                using (MySqlConnection RootConnection = new MySqlConnection(ConnectionString))
+                {
+                    RootConnection.Open();
+
+                    CommandString = $"CREATE USER IF NOT EXISTS '{credential.UserId}'@'{credential.Server}' IDENTIFIED BY '{credential.Password}';";
+                    TraceCommand(CommandString);
+                    Success &= ExecuteCommand(RootConnection, CommandString);
+
+                    CommandString = $"CREATE DATABASE IF NOT EXISTS {credential.Schema.Name} DEFAULT CHARACTER SET utf8;";
+                    TraceCommand(CommandString);
+                    Success &= ExecuteCommand(RootConnection, CommandString);
+
+                    CommandString = $"GRANT ALL ON {credential.Schema.Name}.* TO '{credential.UserId}'@'{credential.Server}';";
+                    TraceCommand(CommandString);
+                    Success &= ExecuteCommand(RootConnection, CommandString);
+
+                    RootConnection.Close();
+                }
+
+                return Success;
+            }
+            catch (Exception e)
+            {
+                TraceMySqlException(e);
+                return false;
+            }
+        }
+
+        public override void DeleteCredential(string rootId, string rootPassword, ICredential credential)
+        {
+            string ConnectionString;
+            string CommandString;
+            int ErrorCode;
+
+            try
+            {
+                ICredential RootCredential = new Credential(credential.Server, rootId, rootPassword);
+                ConnectionString = CredentialToConnectionString(RootCredential, false);
+
+                using (MySqlConnection RootConnection = new MySqlConnection(ConnectionString))
+                {
+                    RootConnection.Open();
+
+                    bool IsDatabaseDropped = false;
+
+                    CommandString = $"SHOW TABLES IN {credential.Schema.Name};";
+                    TraceCommand(CommandString);
+
+                    if ((ExecuteQuery(RootConnection, CommandString, out int TableCount, out ErrorCode) && TableCount == 0) || ErrorCode == ER_BAD_DB_ERROR)
+                    {
+                        CommandString = $"DROP DATABASE IF EXISTS {credential.Schema.Name};";
+                        TraceCommand(CommandString);
+
+                        IsDatabaseDropped = ExecuteCommand(RootConnection, CommandString);
+                    }
+
+                    if (IsDatabaseDropped)
+                    {
+                        try
+                        {
+                            CommandString = $"REVOKE ALL ON {credential.Schema.Name}.* FROM '{credential.UserId}'@'{credential.Server}';";
+                            TraceCommand(CommandString);
+                            ExecuteCommand(RootConnection, CommandString, out ErrorCode);
+                        }
+                        catch
+                        {
+                        }
+
+                        CommandString = $"DROP USER {credential.UserId}@{credential.Server};";
+                        TraceCommand(CommandString);
+                        bool Success = ExecuteCommand(RootConnection, CommandString, out ErrorCode) || ErrorCode == ER_CANNOT_USER;
+                    }
+
+                    RootConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                TraceMySqlException(e);
+            }
+        }
+
+        private static string CredentialToConnectionString(ICredential credential, bool withSchema)
+        {
+            string Result = "";
+
+            Result += "Server=" + credential.Server;
+            Result += ";UserId=" + credential.UserId;
+            Result += ";Password=" + credential.Password;
+
+            if (withSchema)
+                Result += ";Database=" + credential.Schema.Name;
+
+            return Result;
+        }
+        #endregion
+
         #region Schema
-        public override bool CreateTables(ICredential credential, ISchemaDescriptor schema)
+        public override bool CreateTables(ICredential credential)
         {
             string ConnectionString;
             string CommandString;
@@ -38,13 +192,13 @@ namespace Database.Internal
                 {
                     RootConnection.Open();
 
-                    CommandString = "CREATE DATABASE IF NOT EXISTS " + credential.Schema.Name + " DEFAULT CHARACTER SET utf8" + ";";
+                    CommandString = $"CREATE DATABASE IF NOT EXISTS {credential.Schema.Name} DEFAULT CHARACTER SET utf8;";
                     ExecuteCommand(RootConnection, CommandString);
 
-                    CommandString = "USE " + credential.Schema.Name + ";";
+                    CommandString = $"USE {credential.Schema.Name};";
                     ExecuteCommand(RootConnection, CommandString);
 
-                    CreateSchemaTables(schema, RootConnection);
+                    CreateSchemaTables(credential.Schema, RootConnection);
 
                     RootConnection.Close();
                 }
@@ -55,6 +209,65 @@ namespace Database.Internal
             {
                 TraceMySqlException(e);
                 return false;
+            }
+        }
+
+        public override void DeleteTables(ICredential credential)
+        {
+            string ConnectionString;
+            string CommandString;
+            int TableCount;
+            int RowCount;
+            int ErrorCode;
+
+            try
+            {
+                ConnectionString = CredentialToConnectionString(credential, false);
+
+                using (MySqlConnection RootConnection = new MySqlConnection(ConnectionString))
+                {
+                    RootConnection.Open();
+
+                    CommandString = $"SHOW TABLES IN {credential.Schema.Name};";
+                    TraceCommand(CommandString);
+
+                    if (ExecuteQuery(RootConnection, CommandString, out TableCount, out ErrorCode) && TableCount > 0)
+                    {
+                        int EmptyTableCount = 0;
+                        foreach (KeyValuePair<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>> Entry in credential.Schema.Tables)
+                        {
+                            ITableDescriptor Table = Entry.Key;
+                            IColumnDescriptor PrimaryKey = Table.PrimaryKey;
+
+                            CommandString = $"SELECT {PrimaryKey.Name} FROM {Table.Name};";
+                            TraceCommand(CommandString);
+
+                            if (ExecuteQuery(RootConnection, CommandString, out RowCount, out ErrorCode) && RowCount > 0)
+                                break;
+
+                            EmptyTableCount++;
+                        }
+
+                        if (EmptyTableCount == TableCount)
+                        {
+                            foreach (KeyValuePair<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>> Entry in credential.Schema.Tables)
+                            {
+                                ITableDescriptor Table = Entry.Key;
+
+                                CommandString = $"DROP TABLE {Table.Name};";
+                                TraceCommand(CommandString);
+
+                                ExecuteCommand(RootConnection, CommandString, out ErrorCode);
+                            }
+                        }
+                    }
+
+                    RootConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                TraceMySqlException(e);
             }
         }
         #endregion
@@ -73,10 +286,10 @@ namespace Database.Internal
 
                 if (IsOpen)
                 {
-                    string CreateCommandString = "CREATE DATABASE IF NOT EXISTS " + credential.Schema.Name + " DEFAULT CHARACTER SET utf8" + ";";
+                    string CreateCommandString = $"CREATE DATABASE IF NOT EXISTS {credential.Schema.Name} DEFAULT CHARACTER SET utf8;";
                     ExecuteCommand(Connection, CreateCommandString);
 
-                    string UseCommandString = "USE " + credential.Schema.Name + ";";
+                    string UseCommandString = $"USE {credential.Schema.Name};";
                     ExecuteCommand(Connection, UseCommandString);
 
                     return true;
@@ -303,17 +516,22 @@ namespace Database.Internal
                 throw new InvalidCastException("Invalid operation");
         }
 
-        private void TraceCommand(MySqlCommand command)
+        private static void TraceCommand(MySqlCommand command)
         {
             Debugging.Print($"MySql command ({command.GetHashCode()}): {command.CommandText}");
         }
 
-        private void TraceCommandEnd(MySqlCommand command, string diagnostic)
+        private static void TraceCommand(string commandText)
+        {
+            Debugging.Print($"MySql command: {commandText}");
+        }
+
+        private static void TraceCommandEnd(MySqlCommand command, string diagnostic)
         {
             Debugging.Print($"MySql command ({command.GetHashCode()}) {diagnostic}");
         }
 
-        private void TraceMySqlException(Exception e, [CallerMemberName] string CallerName = "")
+        private static void TraceMySqlException(Exception e, [CallerMemberName] string CallerName = "")
         {
             Debugging.Print("MySql exception" + (CallerName.Length > 0 ? " (from " + CallerName + ")" : "") + ": " + e.Message);
         }
@@ -349,96 +567,67 @@ namespace Database.Internal
         }
         #endregion
 
-        #region Credentials
-        public override bool IsCredentialValid(ICredential credential, TimeSpan minDuration)
-        {
-            bool Success;
-            StartWatch(out Stopwatch Watch);
-
-            try
-            {
-                string ConnectionString = CredentialToConnectionString(credential, true);
-
-                using (MySqlConnection VerificationConnection = new MySqlConnection(ConnectionString))
-                {
-                    VerificationConnection.Open();
-                    VerificationConnection.Close();
-                }
-
-                Success = true;
-            }
-            catch (Exception e)
-            {
-                TraceMySqlException(e);
-                Success = false;
-            }
-
-            MinWait(Watch, minDuration);
-            return Success;
-        }
-
-        public override bool CreateCredential(string rootId, string rootPassword, ICredential credential)
-        {
-            string ConnectionString;
-            string CommandString;
-
-            try
-            {
-                ICredential RootCredential = new Credential(credential.Server, rootId, rootPassword);
-                ConnectionString = CredentialToConnectionString(RootCredential, false);
-
-                using (MySqlConnection RootConnection = new MySqlConnection(ConnectionString))
-                {
-                    RootConnection.Open();
-
-                    CommandString = "CREATE USER " + "'" + credential.UserId + "'" + "@" + "'" + "localhost" + "'" + " IDENTIFIED BY " + "'" + credential.Password + "'" + ";";
-                    ExecuteCommand(RootConnection, CommandString);
-
-                    CommandString = "CREATE DATABASE IF NOT EXISTS " + credential.Schema.Name + " DEFAULT CHARACTER SET utf8" + ";";
-                    ExecuteCommand(RootConnection, CommandString);
-
-                    CommandString = "GRANT ALL ON " + credential.Schema.Name + ".* TO " + "'" + credential.UserId + "'" + "@" + "'" + "localhost" + "'" + ";";
-                    ExecuteCommand(RootConnection, CommandString);
-
-                    RootConnection.Close();
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                TraceMySqlException(e);
-                return false;
-            }
-        }
-
-        private static string CredentialToConnectionString(ICredential credential, bool withSchema)
-        {
-            string Result = "";
-
-            Result += "Server=" + credential.Server;
-            Result += ";UserId=" + credential.UserId;
-            Result += ";Password=" + credential.Password;
-
-            if (withSchema)
-                Result += ";Database=" + credential.Schema.Name;
-
-            return Result;
-        }
-        #endregion
-
         #region Initialization
-        public static void ExecuteCommand(MySqlConnection RootConnection, string CommandString)
+        private static bool ExecuteCommand(MySqlConnection rootConnection, string commandString)
+        {
+            return ExecuteCommand(rootConnection, commandString, out int ErrorCode);
+        }
+
+        private static bool ExecuteCommand(MySqlConnection RootConnection, string CommandString, out int errorCode)
         {
             try
             {
                 using (MySqlCommand Command = new MySqlCommand(CommandString, RootConnection))
                 {
                     int Result = Command.ExecuteNonQuery();
+                    errorCode = 0;
+                    return true;
                 }
             }
-            catch
+            catch (Exception e)
             {
+                if (e is MySqlException AsSqlException)
+                    errorCode = AsSqlException.Number;
+                else
+                    errorCode = -1;
+
+                TraceMySqlException(e);
+                return false;
+            }
+        }
+
+        public static bool ExecuteQuery(MySqlConnection rootConnection, string commandString, out int rowCount)
+        {
+            return ExecuteQuery(rootConnection, commandString, out rowCount, out int errorCode);
+        }
+
+        public static bool ExecuteQuery(MySqlConnection rootConnection, string commandString, out int rowCount, out int errorCode)
+        {
+            try
+            {
+                using (MySqlCommand Command = new MySqlCommand(commandString, rootConnection))
+                {
+                    using (MySqlDataReader Reader = Command.ExecuteReader())
+                    {
+                        rowCount = 0;
+                        while (Reader.Read())
+                            rowCount++;
+
+                        errorCode = 0;
+                        return true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                if (e is MySqlException AsSqlException)
+                    errorCode = AsSqlException.Number;
+                else
+                    errorCode = -1;
+
+                TraceMySqlException(e);
+                rowCount = -1;
+                return false;
             }
         }
 
@@ -493,8 +682,8 @@ namespace Database.Internal
                     }
                 }
 
-                string QueryString = "CREATE TABLE IF NOT EXISTS " + TableName + " ( " + ColumnStringList + " );";
-                ExecuteCommand(RootConnection, QueryString);
+                string CommandString = $"CREATE TABLE IF NOT EXISTS {TableName} ( { ColumnStringList} );";
+                ExecuteCommand(RootConnection, CommandString);
             }
         }
         #endregion

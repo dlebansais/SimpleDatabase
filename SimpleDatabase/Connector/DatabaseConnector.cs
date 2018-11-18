@@ -6,7 +6,9 @@ namespace Database.Internal
     {
         bool IsCredentialValid(ICredential credential, TimeSpan minDuration);
         bool CreateCredential(string rootId, string rootPassword, ICredential credential);
-        bool CreateTables(ICredential credential, ISchemaDescriptor schema);
+        bool CreateTables(ICredential credential);
+        void DeleteTables(ICredential credential);
+        void DeleteCredential(string rootId, string rootPassword, ICredential credential);
 
         bool Open(ICredential credential);
         bool IsOpen { get; }
@@ -26,7 +28,9 @@ namespace Database.Internal
     {
         public abstract bool IsCredentialValid(ICredential credential, TimeSpan minDuration);
         public abstract bool CreateCredential(string rootId, string rootPassword, ICredential credential);
-        public abstract bool CreateTables(ICredential credential, ISchemaDescriptor schema);
+        public abstract bool CreateTables(ICredential credential);
+        public abstract void DeleteTables(ICredential credential);
+        public abstract void DeleteCredential(string rootId, string rootPassword, ICredential credential);
 
         public abstract bool IsOpen { get; }
         public abstract bool Open(ICredential credential);

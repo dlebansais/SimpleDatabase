@@ -84,19 +84,43 @@ namespace Database
 
         /// <summary>
         ///     Creates or updates a schema.
-        ///     The schema name used is from <paramref name="schema"/>.
+        ///     The schema name used is from <paramref name="credential"/> default schema.
         ///     If it already exists, only new tables are created, and existing data is preserved.
         /// </summary>
         /// <parameters>
         /// <param name="credential">The credential used to perform the operation.</param>
-        /// <param name="schema">The schema to create.</param>
         /// </parameters>
         /// <returns>
         ///     True if the schema could be created or updated. False if the operation failed.
         /// </returns>
-        bool CreateTables(ICredential credential, ISchemaDescriptor schema);
+        bool CreateTables(ICredential credential);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        Task<bool> CreateTablesAsync(ICredential credential, ISchemaDescriptor schema);
+        Task<bool> CreateTablesAsync(ICredential credential);
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+        /// <summary>
+        ///     Deletes a schema. All tables must be empty.
+        ///     The schema name used is from <paramref name="credential"/> default schema.
+        /// </summary>
+        /// <parameters>
+        /// <param name="credential">The credential used to perform the operation.</param>
+        /// </parameters>
+        void DeleteTables(ICredential credential);
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        Task DeleteTablesAsync(ICredential credential);
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+        /// <summary>
+        ///     Delete an existing user and schema in the database, using information from <paramref name="credential"/>, if the schema contains no tables.
+        /// </summary>
+        /// <parameters>
+        /// <param name="rootId">The root identifier.</param>
+        /// <param name="rootPassword">The root password.</param>
+        /// <param name="credential">Information about the user to delete.</param>
+        /// </parameters>
+        void DeleteCredential(string rootId, string rootPassword, ICredential credential);
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        Task DeleteCredentialAsync(string rootId, string rootPassword, ICredential credential);
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
@@ -314,7 +338,7 @@ namespace Database
         /// </returns>
         public virtual bool IsCredentialValid(ICredential credential)
         {
-            return Connector.IsCredentialValid(credential, TimeSpan.FromSeconds(5));
+            return Connector.IsCredentialValid(credential, TimeSpan.Zero);
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public virtual Task<bool> IsCredentialValidAsync(ICredential credential)
@@ -361,30 +385,66 @@ namespace Database
         {
             return Task.Run(() => Connector.CreateCredential(rootId, rootPassword, credential));
         }
+
+        /// <summary>
+        ///     Delete an existing user and schema in the database, using information from <paramref name="credential"/>, if the schema contains no tables.
+        /// </summary>
+        /// <parameters>
+        /// <param name="rootId">The root identifier.</param>
+        /// <param name="rootPassword">The root password.</param>
+        /// <param name="credential">Information about the user to delete.</param>
+        /// </parameters>
+        public void DeleteCredential(string rootId, string rootPassword, ICredential credential)
+        {
+            Connector.DeleteCredential(rootId, rootPassword, credential);
+        }
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public Task DeleteCredentialAsync(string rootId, string rootPassword, ICredential credential)
+        {
+            return Task.Run(() => Connector.DeleteCredential(rootId, rootPassword, credential));
+        }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         #endregion
 
         #region Schema
         /// <summary>
         ///     Creates or updates a schema.
-        ///     The schema name used is from <paramref name="schema"/>.
+        ///     The schema name used is from <paramref name="credential"/> default schema.
         ///     If it already exists, only new tables are created, and existing data is preserved.
         /// </summary>
         /// <parameters>
         /// <param name="credential">The credential used to perform the operation.</param>
-        /// <param name="schema">The schema to create.</param>
         /// </parameters>
         /// <returns>
         ///     True if the schema could be created or updated. False if the operation failed.
         /// </returns>
-        public virtual bool CreateTables(ICredential credential, ISchemaDescriptor schema)
+        public virtual bool CreateTables(ICredential credential)
         {
-            return Connector.CreateTables(credential, schema);
+            return Connector.CreateTables(credential);
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public virtual Task<bool> CreateTablesAsync(ICredential credential, ISchemaDescriptor schema)
+        public virtual Task<bool> CreateTablesAsync(ICredential credential)
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
-            return Task.Run(() => Connector.CreateTables(credential, schema));
+            return Task.Run(() => Connector.CreateTables(credential));
+        }
+
+        /// <summary>
+        ///     Deletes a schema. All tables must be empty.
+        ///     The schema name used is from <paramref name="credential"/> default schema.
+        /// </summary>
+        /// <parameters>
+        /// <param name="credential">The credential used to perform the operation.</param>
+        /// </parameters>
+        public virtual void DeleteTables(ICredential credential)
+        {
+            Connector.DeleteTables(credential);
+        }
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public virtual Task DeleteTablesAsync(ICredential credential)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        {
+            return Task.Run(() => Connector.DeleteTables(credential));
         }
         #endregion
 
