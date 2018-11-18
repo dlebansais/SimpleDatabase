@@ -573,7 +573,7 @@ namespace Database.Internal
 
         private static void TraceMySqlException(Exception e, [CallerMemberName] string CallerName = "")
         {
-            Debugging.Print("MySql exception" + (CallerName.Length > 0 ? " (from " + CallerName + ")" : "") + ": " + e.Message);
+            Debugging.PrintExceptionMessage("MySql exception" + (CallerName.Length > 0 ? " (from " + CallerName + ")" : "") + ": " + e.Message);
         }
 
         private void StartWatch(out Stopwatch watch)

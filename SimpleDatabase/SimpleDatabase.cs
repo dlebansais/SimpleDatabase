@@ -304,7 +304,7 @@ namespace Database
             }
             catch (Exception e)
             {
-                Debugging.Print(e.Message);
+                Debugging.PrintExceptionMessage(e.Message);
             }
         }
 
@@ -972,7 +972,7 @@ namespace Database
             }
             catch (Exception e)
             {
-                Debugging.Print(e.Message);
+                Debugging.PrintExceptionMessage(e.Message);
                 OperationThread = null;
             }
         }

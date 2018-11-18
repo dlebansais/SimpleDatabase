@@ -11,9 +11,19 @@ namespace Database.Internal
         {
             Debug.Print(s);
         }
+
+        public static void PrintExceptionMessage(string s)
+        {
+            Debug.Print(s);
+        }
 #else
 #if TRACE
         public static void Print(string s)
+        {
+            Debug.Print(s);
+        }
+
+        public static void PrintExceptionMessage(string s)
         {
             throw new ApplicationException(s);
         }
@@ -22,6 +32,11 @@ namespace Database.Internal
         public static extern void OutputDebugString(string message);
 
         public static void Print(string s)
+        {
+            OutputDebugString(s);
+        }
+
+        public static void PrintExceptionMessage(string s)
         {
             OutputDebugString(s);
         }
