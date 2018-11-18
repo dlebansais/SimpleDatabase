@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Database.Internal
 {
-    internal class Debugging
+    internal static class Debugging
     {
 #if DEBUG
         public static void Print(string s)
@@ -23,7 +23,7 @@ namespace Database.Internal
             if (AccumulatedTraces == null)
                 AccumulatedTraces = s;
             else
-                AccumulatedTraces += "\n" + AccumulatedTraces;
+                AccumulatedTraces += "\n" + s;
 
             Debug.Print(s);
         }
