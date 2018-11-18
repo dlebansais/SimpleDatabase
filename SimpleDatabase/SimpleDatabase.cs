@@ -298,6 +298,10 @@ namespace Database
 
                 Debugging.Print("Connector created: " + Connector.ToString());
             }
+            catch (ApplicationException e)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 Debugging.Print(e.Message);
@@ -961,6 +965,10 @@ namespace Database
 
                 OperationThread = new Thread(new ThreadStart(ExecuteOperation));
                 OperationThread.Start();
+            }
+            catch (ApplicationException e)
+            {
+                throw;
             }
             catch (Exception e)
             {

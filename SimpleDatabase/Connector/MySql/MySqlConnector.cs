@@ -49,6 +49,10 @@ namespace Database.Internal
 
                 Success = true;
             }
+            catch (ApplicationException e)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 bool IsValidityError = false;
@@ -101,6 +105,10 @@ namespace Database.Internal
                 }
 
                 return Success;
+            }
+            catch (ApplicationException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -157,6 +165,10 @@ namespace Database.Internal
                     RootConnection.Close();
                 }
             }
+            catch (ApplicationException e)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -204,6 +216,10 @@ namespace Database.Internal
                 }
 
                 return true;
+            }
+            catch (ApplicationException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -265,6 +281,10 @@ namespace Database.Internal
                     RootConnection.Close();
                 }
             }
+            catch (ApplicationException e)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -296,6 +316,10 @@ namespace Database.Internal
                 }
                 else
                     return false;
+            }
+            catch (ApplicationException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -406,6 +430,10 @@ namespace Database.Internal
                 ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult, finalizer);
                 ActiveOperationTable.Add(ActiveOperation, Command);
             }
+            catch (ApplicationException e)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -438,6 +466,10 @@ namespace Database.Internal
                 OperationResult = createResultHandler(operation, Result);
                 ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult, finalizer);
                 ActiveOperationTable.Add(ActiveOperation, Command);
+            }
+            catch (ApplicationException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -483,6 +515,10 @@ namespace Database.Internal
                 ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult, finalizer);
                 ActiveOperationTable.Add(ActiveOperation, Command);
             }
+            catch (ApplicationException e)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -506,6 +542,10 @@ namespace Database.Internal
 
                         TraceCommandEnd(Command, Diagnostic);
                     }
+                }
+                catch (ApplicationException e)
+                {
+                    throw;
                 }
                 catch (Exception e)
                 {
@@ -560,6 +600,10 @@ namespace Database.Internal
                 Connection.Close();
                 Connection = null;
             }
+            catch (ApplicationException e)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 TraceMySqlException(e);
@@ -583,6 +627,10 @@ namespace Database.Internal
                     errorCode = 0;
                     return true;
                 }
+            }
+            catch (ApplicationException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -617,6 +665,10 @@ namespace Database.Internal
                         return true;
                     }
                 }
+            }
+            catch (ApplicationException e)
+            {
+                throw;
             }
             catch (Exception e)
             {

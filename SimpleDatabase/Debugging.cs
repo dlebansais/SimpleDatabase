@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Database.Internal
@@ -14,7 +15,7 @@ namespace Database.Internal
 #if TRACE
         public static void Print(string s)
         {
-            Debug.Print(s);
+            throw new ApplicationException(s);
         }
 #else
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
