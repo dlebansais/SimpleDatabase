@@ -91,7 +91,7 @@ namespace Database.Internal
                 {
                     RootConnection.Open();
                     ReadServerVersion(RootConnection);
-                    AnalyzeRootPrivileges(RootConnection, credential.Server, rootId);
+                    //AnalyzeRootPrivileges(RootConnection, credential.Server, rootId);
 
                     if (ServerVersionMajor >= 8)
                     {
