@@ -97,7 +97,7 @@ namespace Database.Internal
 
                     if (!ExecuteQuery(RootConnection, CommandString, out int UserCount) || UserCount == 0)
                     {
-                        CommandString = $"CREATE USER IF NOT EXISTS '{credential.UserId}'@'{credential.Server}' IDENTIFIED BY '{credential.Password}';";
+                        CommandString = $"CREATE USER '{credential.UserId}'@'{credential.Server}' IDENTIFIED BY '{credential.Password}';";
                         TraceCommand(CommandString);
                         Success &= ExecuteCommand(RootConnection, CommandString);
                     }
