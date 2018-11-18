@@ -5,20 +5,26 @@ namespace Database.Internal
 {
     internal class Debugging
     {
+#if DEBUG
+        public static void Print(string s)
+        {
+            Debug.Print(s);
+        }
+#else
+#if TRACE
+        public static void Print(string s)
+        {
+            Debug.Print(s);
+        }
+#else
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern void OutputDebugString(string message);
 
         public static void Print(string s)
         {
-#if DEBUG
-            Debug.Print(s);
-#else
-#if TRACE
-            Debug.Print(s);
-#else
             OutputDebugString(s);
-#endif
-#endif
         }
+#endif
+#endif
     }
 }
