@@ -15,7 +15,7 @@ namespace TestDebug
         public IColumnDescriptorGuid Test0_Guid { get; }
 
         public TestSchema()
-            : base("test")
+            : base("mytest")
         {
             Test0 = new TableDescriptor(this, "Test0");
             Test0_Guid = new ColumnDescriptorGuid(Test0, "guid");

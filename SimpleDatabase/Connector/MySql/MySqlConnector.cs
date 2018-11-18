@@ -91,6 +91,7 @@ namespace Database.Internal
                 {
                     RootConnection.Open();
                     ReadServerVersion(RootConnection);
+                    AnalyzeRootPrivileges(RootConnection, credential.Server, rootId);
 
                     if (ServerVersionMajor >= 8)
                     {
@@ -691,6 +692,33 @@ namespace Database.Internal
                         }
                     }
                 }
+            }
+            catch
+            {
+            }
+        }
+
+        public static void AnalyzeRootPrivileges(MySqlConnection rootConnection, string server, string rootId)
+        {
+            try
+            {
+                string Result = "RootPrivileges:\n";
+
+                using (MySqlCommand Command = new MySqlCommand($"SELECT * FROM mysql.user WHERE User='{rootId}' and Host='{server}'", rootConnection))
+                {
+                    using (MySqlDataReader Reader = Command.ExecuteReader())
+                    {
+                        while (Reader.Read())
+                        {
+                            for (int i = 0; i < Reader.FieldCount; i++)
+                                Result += $"{Reader.GetName(i)}: {Reader[i]}\n";
+
+                            Result += $"****\n";
+                        }
+                    }
+                }
+
+                Debugging.Print(Result);
             }
             catch
             {
