@@ -25,27 +25,6 @@ namespace Database
         #region Init
         /// <summary>
         ///     Initializes a new instance of the <see cref="UpdateContext"/> class.
-        ///     This request has no constraints.
-        ///     If <paramref name="entryList"/> is empty, nothing is updated and the request returns success immediately.
-        /// </summary>
-        /// <parameters>
-        /// <param name="table">The table addressed by the request.</param>
-        /// <param name="entryList">The colums and new values to update.</param>
-        /// </parameters>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="table"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="entryList"/> is null.
-        /// </exception>
-        public UpdateContext(ITableDescriptor table, IEnumerable<IColumnValuePair> entryList)
-            : base(table)
-        {
-            InitEntryList(entryList);
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="UpdateContext"/> class.
         ///     This request has a constraint: one column must match one value.
         ///     If <paramref name="entryList"/> is empty, nothing is updated and the request returns success immediately.
         /// </summary>
@@ -71,7 +50,7 @@ namespace Database
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="UpdateContext"/> class.
-        ///     This request has a constraint: several columns must match a single value.
+        ///     This request has a constraint: several columns must match a given value.
         ///     If <paramref name="constraintList"/> is empty, no constraint will be applied to the request.
         ///     If <paramref name="entryList"/> is empty, nothing is updated and the request returns success immediately.
         /// </summary>

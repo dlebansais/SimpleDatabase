@@ -24,9 +24,13 @@ namespace Database.Internal
             string TableName = GetTableName();
             string ConstraintString = GetConstraintString();
 
-            string Result = "DELETE FROM " + TableName + " WHERE " + ConstraintString;
+            string Result;
+            if (ConstraintString != null)
+                Result = $"DELETE FROM {TableName} WHERE {ConstraintString};";
+            else
+                Result = $"DELETE FROM {TableName};";
 
-            return Result + ";";
+            return Result;
         }
 
         public virtual string FinalizeOperation(MySqlCommand Command, IMultiRowDeleteResultInternal Result)
@@ -105,8 +109,10 @@ namespace Database.Internal
         {
             if (Context.MultipleConstraintList != null)
                 return GetMultipleConstraintString();
-            else
+            else if (Context.SingleConstraintEntry != null)
                 return GetSingleConstraintString();
+            else
+                return null;
         }
         #endregion
     }

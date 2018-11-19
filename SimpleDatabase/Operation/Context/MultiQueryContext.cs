@@ -26,6 +26,23 @@ namespace Database
         #region Init
         /// <summary>
         ///     Initializes a new instance of the <see cref="MultiQueryContext"/> class.
+        ///     This instance has no join and addresses only one table.
+        ///     Creating a request with zero columns is valid, and the corresponding operation will always return success with no rows immediately.
+        /// </summary>
+        /// <parameters>
+        /// <param name="filterList">The columns to query.</param>
+        /// </parameters>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="filterList"/> is null.
+        /// </exception>
+        public MultiQueryContext(IEnumerable<IColumnDescriptor> filterList)
+            : base()
+        {
+            InitFilters(filterList);
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MultiQueryContext"/> class.
         ///     Creating a request with zero columns is valid, and the corresponding operation will always return success with no rows immediately.
         /// </summary>
         /// <parameters>
@@ -35,11 +52,35 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="join"/> is null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="join"/> does not describe a valid join.
+        /// </exception>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="filterList"/> is null.
         /// </exception>
         public MultiQueryContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnDescriptor> filterList)
             : base(join)
+        {
+            InitFilters(filterList);
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MultiQueryContext"/> class.
+        ///     This instance has no join and addresses only one table.
+        ///     Creating a request with zero columns is valid, and the corresponding operation will always return success with no rows immediately.
+        /// </summary>
+        /// <parameters>
+        /// <param name="constraintList">The constraints matching values must fulfill.</param>
+        /// <param name="filterList">The columns to query.</param>
+        /// </parameters>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="constraintList"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="filterList"/> is null.
+        /// </exception>
+        public MultiQueryContext(IEnumerable<IColumnValueCollectionPair> constraintList, IEnumerable<IColumnDescriptor> filterList)
+            : base(constraintList)
         {
             InitFilters(filterList);
         }
@@ -55,6 +96,9 @@ namespace Database
         /// </parameters>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="join"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="join"/> does not describe a valid join.
         /// </exception>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="constraintList"/> is null.

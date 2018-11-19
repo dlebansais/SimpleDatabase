@@ -37,7 +37,7 @@ namespace Database
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="SingleRowDeleteContext"/> class.
-        ///     This request has a constraint: several columns must match a single value.
+        ///     This request has a constraint: several columns must match a given value.
         ///     If <paramref name="constraintList"/> is empty, no constraint will be applied to the request.
         /// </summary>
         /// <parameters>

@@ -102,6 +102,7 @@ namespace Database.Internal
             IReadOnlyCollection<IColumnValuePair> ConstraintList = Context.ConstraintList;
 
             Debug.Assert(ConstraintList != null);
+            Debug.Assert(ConstraintList.Count > 0);
 
             string TableName = Table.Name;
 
@@ -122,6 +123,7 @@ namespace Database.Internal
                 ConstraintString += "(" + ColumnName + "=" + FormattedValue + ")";
             }
 
+            Debug.Assert(!string.IsNullOrEmpty(ConstraintString));
             return ConstraintString;
         }
         #endregion

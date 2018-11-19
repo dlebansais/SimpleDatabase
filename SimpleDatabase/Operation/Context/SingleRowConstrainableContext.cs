@@ -25,22 +25,6 @@ namespace Database
         #region Init
         /// <summary>
         ///     Initializes a new instance of the <see cref="SingleRowConstrainableContext"/> class.
-        ///     This request has no constraints.
-        /// </summary>
-        /// <parameters>
-        /// <param name="table">The table addressed by the request.</param>
-        /// </parameters>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="table"/> is null.
-        /// </exception>
-        public SingleRowConstrainableContext(ITableDescriptor table)
-            : base(table)
-        {
-            ConstraintList = new List<IColumnValuePair>();
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="SingleRowConstrainableContext"/> class.
         ///     This request has a constraint: one column must match one value.
         /// </summary>
         /// <parameters>
@@ -64,7 +48,7 @@ namespace Database
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="SingleRowConstrainableContext"/> class.
-        ///     This request has a constraint: several columns must match a single value.
+        ///     This request has a constraint: several columns must match a given value.
         ///     If <paramref name="constraintList"/> is empty, no constraint will be applied to the request.
         /// </summary>
         /// <parameters>

@@ -1,5 +1,7 @@
 ﻿using Database.Types;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Database
 {
@@ -32,6 +34,14 @@ namespace Database
         ///     The column used to hold primary keys in the table.
         /// </returns>
         IColumnDescriptor PrimaryKey { get; }
+
+        /// <summary>
+        ///     Gets all columns in the table.
+        /// </summary>
+        /// <returns>
+        ///     All columns in the table.
+        /// </returns>
+        IEnumerable<IColumnDescriptor> All { get; }
     }
     #endregion
 
@@ -94,9 +104,32 @@ namespace Database
         {
             get
             {
+                Debug.Assert(Schema.Tables.ContainsKey(this));
+                Debug.Assert(Schema.Tables[this].Count > 0);
+
                 if (Schema.Tables.ContainsKey(this))
                     foreach (IColumnDescriptor Column in Schema.Tables[this])
                         return Column;
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        ///     Gets all columns in the table.
+        /// </summary>
+        /// <returns>
+        ///     All columns in the table.
+        /// </returns>
+        public virtual IEnumerable<IColumnDescriptor> All
+        {
+            get
+            {
+                Debug.Assert(Schema.Tables.ContainsKey(this));
+                Debug.Assert(Schema.Tables[this].Count > 0);
+
+                if (Schema.Tables.ContainsKey(this))
+                    return Schema.Tables[this];
 
                 return null;
             }

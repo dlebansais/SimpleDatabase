@@ -26,6 +26,15 @@ namespace Database
         #region Init
         /// <summary>
         ///     Initializes a new instance of the <see cref="MultiTableOperationContext"/> class.
+        ///     This instance has no join and addresses only one table.
+        /// </summary>
+        public MultiTableOperationContext()
+        {
+            Join = new Dictionary<IColumnDescriptor, IColumnDescriptor>();
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MultiTableOperationContext"/> class.
         /// </summary>
         /// <parameters>
         /// <param name="join">The join describing how tables are connected in the request.</param>
