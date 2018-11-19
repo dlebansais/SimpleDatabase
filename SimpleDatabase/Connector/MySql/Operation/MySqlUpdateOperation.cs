@@ -33,14 +33,22 @@ namespace Database.Internal
 
         public virtual string FinalizeOperation(MySqlCommand Command, IUpdateResultInternal Result)
         {
-            int ModifiedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
-            bool Success = ModifiedLines > 0;
-            Result.SetCompleted(Success);
+            try
+            {
+                int ModifiedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
+                bool Success = ModifiedLines > 0;
+                Result.SetCompleted(Success);
 
-            if (Success)
-                return $"succeeded, {ModifiedLines} row(s) modified";
-            else
-                return "failed";
+                if (Success)
+                    return $"succeeded, {ModifiedLines} row(s) modified";
+                else
+                    return "failed";
+            }
+            catch
+            {
+                Result.SetCompleted(false);
+                throw;
+            }
         }
         #endregion
 

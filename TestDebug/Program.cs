@@ -38,30 +38,14 @@ namespace TestDebug
             DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test0, 0));
             DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test1, 0));
 
-            ISingleInsertResult InsertResult;
+            ISingleInsertResult InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<ColumnValuePair<Guid>>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty) }));
 
-            InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey0) }));
+            Database.Close();
+            Database.DeleteTables(Credential);
+            Database.DeleteCredential(RootId, RootPassword, Credential);
 
-            InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 1) }));
-
-            InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey0) }));
-
-            InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey1), new ColumnValuePair<int>(TestSchema.Test0_Int, 1) }));
-
-            InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test1, new List<IColumnValuePair>() { new ColumnValuePair<string>(TestSchema.Test1_String, "row 0") }));
-
-            InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test1, new List<IColumnValuePair>() { new ColumnValuePair<string>(TestSchema.Test1_String, "row 1") }));
-
-            InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test1, new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test1_Int, 1), new ColumnValuePair<string>(TestSchema.Test1_String, "row 0") }));
-
-            IMultiQueryResult SelectResult;
-            SelectResult = Database.Run(new MultiQueryContext(TestSchema.Test0.All));
-            List<IResultRow> RowList = new List<IResultRow>(SelectResult.RowList);
-            TestSchema.Test0_Guid.TryParseRow(RowList[0], out Guid Test0_Row_0_0);
-            TestSchema.Test0_Int.TryParseRow(RowList[0], out int Test0_Row_0_1);
-            TestSchema.Test0_Guid.TryParseRow(RowList[1], out Guid Test0_Row_1_0);
-            TestSchema.Test0_Int.TryParseRow(RowList[1], out int Test0_Row_1_1);
-
+            Database.Open(Credential);
+            ISingleRowDeleteResult SingleDeleteResult = Database.Run(new SingleRowDeleteContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty)));
 
             DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test0, 0));
             DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test1, 0));

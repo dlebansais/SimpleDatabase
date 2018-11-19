@@ -34,18 +34,26 @@ namespace Database.Internal
 
         public virtual string FinalizeOperation(MySqlCommand Command, ISingleQueryResultInternal Result)
         {
-            using (MySqlDataReader Reader = Command.EndExecuteReader(Result.AsyncResult))
+            try
             {
-                ITableDescriptor Table = Context.Table;
-                ISchemaDescriptor Schema = Table.Schema;
-                IReadOnlyCollection<IColumnDescriptor> TableStructure = Schema.Tables[Table];
-                bool Success = FillResult(Reader, TableStructure, out List<IResultRow> Rows);
-                Result.SetCompletedWithResult(Success, Rows);
+                using (MySqlDataReader Reader = Command.EndExecuteReader(Result.AsyncResult))
+                {
+                    ITableDescriptor Table = Context.Table;
+                    ISchemaDescriptor Schema = Table.Schema;
+                    IReadOnlyCollection<IColumnDescriptor> TableStructure = Schema.Tables[Table];
+                    bool Success = FillResult(Reader, TableStructure, out List<IResultRow> Rows);
+                    Result.SetCompletedWithResult(Success, Rows);
 
-                if (Success)
-                    return $"succeeded, {Rows.Count} row(s) returned";
-                else
-                    return "failed";
+                    if (Success)
+                        return $"succeeded, {Rows.Count} row(s) returned";
+                    else
+                        return "failed";
+                }
+            }
+            catch
+            {
+                Result.SetCompleted(false);
+                throw;
             }
         }
         #endregion

@@ -48,14 +48,22 @@ namespace Database.Internal
 
         public virtual string FinalizeOperation(MySqlCommand Command, IMultiInsertResultInternal Result)
         {
-            int InsertedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
-            bool Success = (InsertedLines > 0);
-            Result.SetCompleted(Success);
+            try
+            {
+                int InsertedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
+                bool Success = (InsertedLines > 0);
+                Result.SetCompleted(Success);
 
-            if (Success)
-                return $"succeeded, {InsertedLines} row(s) inserted";
-            else
-                return "failed";
+                if (Success)
+                    return $"succeeded, {InsertedLines} row(s) inserted";
+                else
+                    return "failed";
+            }
+            catch
+            {
+                Result.SetCompleted(false);
+                throw;
+            }
         }
         #endregion
 

@@ -31,14 +31,22 @@ namespace Database.Internal
 
         public virtual string FinalizeOperation(MySqlCommand Command, ISingleRowDeleteResultInternal Result)
         {
-            int DeletedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
-            bool Success = DeletedLines > 0;
-            Result.SetCompleted(Success);
+            try
+            {
+                int DeletedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
+                bool Success = DeletedLines > 0;
+                Result.SetCompleted(Success);
 
-            if (Success)
-                return $"succeeded, {DeletedLines} row(s) deleted";
-            else
-                return "failed";
+                if (Success)
+                    return $"succeeded, {DeletedLines} row(s) deleted";
+                else
+                    return "failed";
+            }
+            catch
+            {
+                Result.SetCompleted(false);
+                throw;
+            }
         }
         #endregion
 

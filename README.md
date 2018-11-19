@@ -107,9 +107,9 @@ The following example inserts three rows, with guids `guidKey0`, `guidKey1` and 
 
 ## Updating data
 
-Updating is done set of values at a time, with the `UpdateContext` object. One set of values means you can assign only one new value in each column, but in can be on several rows together.
+Updating is done one set of values at a time, with the `UpdateContext` object. One set of values means you can assign only one new value in each column, but in can be on several rows together.
 
-Updating can either target all rows for which a column contains a given value (*WHERE column = 'xxx'*) or any of several values (*WHERE column = 'xxx' OR column = 'yyy' OR column = 'zzz'*).
+Updating can either target all rows for which a column contains a given value (*WHERE column = 'xxx'*) or rows for which several columns have a specific value (*WHERE columnX = 'xxx' AND columnY = 'yyy' AND columnZ = 'zzz'*).
 
 Here is an example of the former:
 
@@ -119,11 +119,23 @@ Here is an example of the former:
 
 This example replaces all values in `column_int`, in rows for which `column_guid` is equal to `guidKey`, with the int value `10`.
 
-Here is now an example of updating rows where a value match one among several:
+Here is now an example of updating rows where several columns must match a given value:
 
   ```cs
-  UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey0), new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey1) }, new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 10) }));
+  UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey), new ColumnValuePair<int>(TestSchema.Test0_Int, 10) }, new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 20) }));
   ```
 
-This time, rows that are updated are those for which `column_guid` is equal to `guidKey0` or `guidKey1`.
- 
+This time, rows that are updated are those for which `column_guid` is equal to `guidKey` and `column_int` is equal to `10`.
+
+## Deleting rows
+
+Deleting rows has more options. When performing a delete operation, you can set a minimum number of rows to delete for the operation to be considered successful. This can be zero, but typically it can be the number of rows returned by a query targetting specific values. If you use the same targetting object for the delete, the number of rows returned, and the delete is successful, you know all rows have been deleted.
+
+Deleting rows also has the following options: 
+
+1. Delete all rows in a table
+2. Delete rows for which a column has a specific value
+3. Delete rows for which several columns each have a specific value
+3. Delete rows for which a column has a one value among many.
+
+

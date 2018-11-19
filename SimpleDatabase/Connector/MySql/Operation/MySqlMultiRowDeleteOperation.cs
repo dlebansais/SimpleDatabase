@@ -35,15 +35,23 @@ namespace Database.Internal
 
         public virtual string FinalizeOperation(MySqlCommand Command, IMultiRowDeleteResultInternal Result)
         {
-            int DeletedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
-            int MinRowDelete = Context.ExpectedDeletedCount;
-            bool Success = (DeletedLines >= MinRowDelete);
-            Result.SetCompleted(Success);
+            try
+            {
+                int DeletedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
+                int MinRowDelete = Context.ExpectedDeletedCount;
+                bool Success = (DeletedLines >= MinRowDelete);
+                Result.SetCompleted(Success);
 
-            if (Success)
-                return $"succeeded, {DeletedLines} row(s) deleted";
-            else
-                return "failed";
+                if (Success)
+                    return $"succeeded, {DeletedLines} row(s) deleted";
+                else
+                    return "failed";
+            }
+            catch
+            {
+                Result.SetCompleted(false);
+                throw;
+            }
         }
         #endregion
 

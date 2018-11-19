@@ -36,15 +36,23 @@ namespace Database.Internal
 
         public virtual string FinalizeOperation(MySqlCommand Command, IMultiQueryResultInternal Result)
         {
-            using (MySqlDataReader Reader = Command.EndExecuteReader(Result.AsyncResult))
+            try
             {
-                bool Success = FillResult(Reader, out List<IResultRow> Rows);
-                Result.SetCompletedWithResult(Success, Rows);
+                using (MySqlDataReader Reader = Command.EndExecuteReader(Result.AsyncResult))
+                {
+                    bool Success = FillResult(Reader, out List<IResultRow> Rows);
+                    Result.SetCompletedWithResult(Success, Rows);
 
-                if (Success)
-                    return $"succeeded, {Rows.Count} row(s) returned";
-                else
-                    return "failed";
+                    if (Success)
+                        return $"succeeded, {Rows.Count} row(s) returned";
+                    else
+                        return "failed";
+                }
+            }
+            catch
+            {
+                Result.SetCompleted(false);
+                throw;
             }
         }
         #endregion
