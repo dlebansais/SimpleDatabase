@@ -9,5 +9,121 @@ A C# layer over MySql for basic operations. Strongly typed, async, nothrow.
 
 ![Build Status](https://img.shields.io/travis/dlebansais/SimpleDatabase/master.svg)
 
+# Reference
 
+## Defining your database
 
+A the core of the library is a database description class for your application. You define your own class, inheriting from SchemaDescriptor, and enumerate your tables and columns in the contructor. Below is a simple example, that defines two tables in a schema named *mytest*:
+
+  ```cs
+  public class TestSchema : SchemaDescriptor
+  {
+    public ITableDescriptor Test0 { get; }
+    public IColumnDescriptorGuid Test0_Guid { get; }
+    public IColumnDescriptorInt Test0_Int { get; }
+
+    public ITableDescriptor Test1 { get; }
+    public IColumnDescriptorInt Test1_Int { get; }
+    public IColumnDescriptorString Test1_String { get; }
+
+    public TestSchema()
+        : base("mytest")
+    {
+      Test0 = new TableDescriptor(this, "Test0");
+      Test0_Guid = new ColumnDescriptorGuid(Test0, "column_guid");
+      Test0_Int = new ColumnDescriptorInt(Test0, "column_int");
+
+      Test1 = new TableDescriptor(this, "Test1");
+      Test1_Int = new ColumnDescriptorInt(Test1, "column_int");
+      Test1_String = new ColumnDescriptorString(Test1, "column_string");
+    }
+  }
+  ```
+This will automatically fill and organize internal collections in `SchemaDescriptor`, and hence, in `TestSchema` as well.  
+In the remaining of the document, we will refer to this schema for examples. 
+ 
+## Setting up
+
+The library contains several methods to install the database (though it assumes the server is started).
+1. To create a new SQL user and a new SQL database, call the CreateCredential method.
+
+  ```cs
+  ICredential Credential = new Credential(Server, UserId, UserPassword, TestSchema);
+  ISimpleDatabase Database = new SimpleDatabase();
+  Database.Initialize(ConnectorType, ConnectionOption);
+  Database.CreateCredential(RootId, RootPassword, Credential);
+  ```
+
+2. The database at this stage is empty (it has no table). Use the CreateTables method to remedy to this situation.
+
+  ```cs
+  Database.CreateTables(Credential);
+  ```
+
+## Opening the database
+
+For every run of your application, you need to open a new session:
+
+  ```cs
+  ICredential Credential = new Credential(Server, UserId, UserPassword, TestSchema);
+  ISimpleDatabase Database = new SimpleDatabase();
+  Database.Initialize(ConnectorType, ConnectionOption);
+  Database.Open(Credential);
+  ```
+
+## Perfoming operations
+
+All operations (queries, update, deleting...) are performed as follow.
+1. You create and fill a context object, for example `MultiQueryContext` (see the [Selecting data](#selecting-data) section for a specific example).
+2. You call the corresponding `Database.Run` method. There is one method per context type, all called `Run`.
+3. Alternatively, you call `Database.RunAsync` for asynchronous execution.
+4. When execution is completed, `Run` returns one of the `xxResult` objects, matching the context used. For instance, in the `MultiQueryContext`, it will return a `IMultiQueryResult` object.
+5. You can inspect the `Success` property of this object, and for query operations the `RowList` property.
+
+When a value is associated to a column, either because you insert it or because it's reported in the row list, the class used is `IColumnValuePair` with the specific type of the column. For example, `IColumnValuePair<Guid>` if the column contains guids.
+
+When several values are associated to the column, use `IColumnValueCollectionPair` in one of its type-specific incarnations (ex: `IColumnValueCollectionPair<Guid>`).
+
+If you want to address all columns of a table, you can use the `All` property of `ITableDescriptor`.
+
+The next sections describe each operation and their details.
+  
+## Inserting new data
+
+The library allows you to insert data either one row at a time, or several rows together.
+
+To insert a single row, create a `SingleInsertContext` object, with arguments the list of columns for which you provide a value. The following example inserts a new row in the Test0 table, providing the value for the column_guid column but not for other columns.
+
+  ```cs
+  ISingleInsertResult InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, new Guid("{1BA0D7E9-039F-44E6-A966-CC67AC01A65D}")) }));
+  ```
+
+To insert more than one row, you can use a `MultiInsertContext` object. This object takes the number of rows you want to insert, and for each of them a `IColumnValueCollectionPair` that will list all values for that row. Note that all value lists must have exactly as many values as rows inserted. If you want to keep some rows without values, you will need a more complicated sequence, for example by inserting each row seperately with a `SingleInsertContext`.
+The following example inserts three rows, with guids `guidKey0`, `guidKey1` and `guidKey2` (not explicited here, for clarity).
+
+  ```cs
+  IMultiInsertResult InsertResult = Database.Run(new MultiInsertContext(TestSchema.Test0, 3, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<Guid>(TestSchema.Test0_Guid, new List<Guid>() { guidKey0, guidKey1, guidKey2 }), }));
+  ```
+
+## Updating data
+
+Updating is done set of values at a time, with the `UpdateContext` object. One set of values means you can assign only one new value in each column, but in can be on several rows together.
+
+Updating can either target all rows for which a column contains a given value (*WHERE column = 'xxx'*) or any of several values (*WHERE column = 'xxx' OR column = 'yyy' OR column = 'zzz'*).
+
+Here is an example of the former:
+
+  ```cs
+  IUpdateResult UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 10) }));
+  ```
+
+This example replaces all values in `column_int`, in rows for which `column_guid` is equal to `guidKey`, with the int value `10`.
+
+Here is now an example of updating rows where a value match one among several:
+
+  ```cs
+  UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey0), new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey1) }, new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 10) }));
+  ```
+
+This time, rows that are updated are those for which `column_guid` is equal to `guidKey0` or `guidKey1`.
+ 
