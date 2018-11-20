@@ -160,7 +160,7 @@ namespace Database.Internal
                 return GetSingleConstraintString(out ConstraintString);
         }
 
-        protected virtual bool FillResult(MySqlDataReader Reader, IReadOnlyCollection<IColumnDescriptor> TableStructure, out List<IResultRow> Rows)
+        protected virtual bool FillResult(MySqlDataReader reader, IReadOnlyCollection<IColumnDescriptor> TableStructure, out List<IResultRow> Rows)
         {
             IReadOnlyCollection<IColumnDescriptor> Filters = Context.Filters;
 
@@ -176,15 +176,16 @@ namespace Database.Internal
             string TableName = GetTableName();
             Rows = new List<IResultRow>();
 
-            while (Reader.Read())
+            while (reader.Read())
             {
                 IResultRowInternal NewResult = new ResultRow();
 
                 foreach (IColumnDescriptor Column in Filters)
                 {
                     string ColumnName = Column.Name;
-                    object ConvertedValue = Reader[ColumnName];
-                    NewResult.AddResult(Column, ConvertedValue);
+                    int ColumnIndex = reader.GetOrdinal(ColumnName);
+                    if (!reader.IsDBNull(ColumnIndex))
+                        NewResult.AddResult(Column, reader[ColumnName]);
                 }
 
                 Rows.Add(NewResult);

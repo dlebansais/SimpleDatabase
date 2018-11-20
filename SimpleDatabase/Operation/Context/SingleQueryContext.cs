@@ -27,6 +27,23 @@ namespace Database
         /// <summary>
         ///     Initializes a new instance of the <see cref="SingleQueryContext"/> class.
         ///     This request has no constraints.
+        ///     This request query the value of all columns in the table.
+        /// </summary>
+        /// <parameters>
+        /// <param name="table">The table addressed by the request.</param>
+        /// </parameters>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="table"/> is null.
+        /// </exception>
+        public SingleQueryContext(ITableDescriptor table)
+            : base(table)
+        {
+            InitFilters(table.All);
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SingleQueryContext"/> class.
+        ///     This request has no constraints.
         ///     This request query the value of a single column.
         /// </summary>
         /// <parameters>

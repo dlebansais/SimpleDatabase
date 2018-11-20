@@ -20,20 +20,22 @@ When possible, methods of the library will not throw any exception. This doesn't
 
 The code below provides a simple example of how to use the library. More complete examples are provided later, this example is just intended to help the reader check if this is what they are looking for.
 
-    ISimpleDatabase Database = new SimpleDatabase();
-    Database.Initialize(ConnectorType.MySql, ConnectionOption.KeepAlive);
-    
-    ITestSchema TestSchema = new TestSchema();
-    ICredential Credential = new Credential("localhost", "test", "test", TestSchema);
-    
-    Database.Open(Credential);
+  ```cs
+  ISimpleDatabase Database = new SimpleDatabase();
+  Database.Initialize(ConnectorType.MySql, ConnectionOption.KeepAlive);
 
-    ISingleInsertContext InsertContext = 
-        new SingleInsertContext(TestSchema.mytest, 
-                                new List<IColumnValuePair>() 
-                                   { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, myguid) })
+  ITestSchema TestSchema = new TestSchema();
+  ICredential Credential = new Credential("localhost", "test", "test", TestSchema);
 
-    ISingleInsertResult InsertResult = Database.Run(InsertContext);
+  Database.Open(Credential);
+
+  IInsertContext InsertContext =
+    new InsertContext(TestSchema.mytest,
+      new List<IColumnValuePair>()
+        { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, myguid) })
+
+  IInsertResult InsertResult = Database.Run(InsertContext);
+  ```
     
 The code above opens the database and insert a new row with guid value `myguid` in the *mytest* table.
 
@@ -67,6 +69,7 @@ A the core of the library is a database description class for your application. 
     }
   }
   ```
+
 This will automatically fill and organize internal collections in `SchemaDescriptor`, and hence, in `TestSchema` as well.  
 In the remaining of the document, we will refer to this schema for examples. 
  
@@ -102,10 +105,10 @@ For every run of your application, you need to open a new session:
 ## Perfoming operations
 
 All operations (queries, update, deleting...) are performed as follow.
-1. You create and fill a context object, for example `MultiQueryContext` (see the [Selecting data](#selecting-data) section for a specific example).
+1. You create and fill a context object, for example `QueryContext` (see the [Selecting data](#selecting-data) section for a specific example).
 2. You call the corresponding `Database.Run` method. There is one method per context type, all called `Run`.
 3. Alternatively, you call `Database.RunAsync` for asynchronous execution.
-4. When execution is completed, `Run` returns one of the `xxResult` objects, matching the context used. For instance, in the `MultiQueryContext` case, it will return a `IMultiQueryResult` object.
+4. When execution is completed, `Run` returns one of the `xxResult` objects, matching the context used. For instance, in the `QueryContext` case, it will return a `IQueryResult` object.
 5. You can inspect the `Success` property of this object, and for query operations the `RowList` property.
 
 When a value is associated to a column, either because you insert it or because it's reported in the row list, the class used is `IColumnValuePair` with the specific type of the column. For example, `IColumnValuePair<Guid>` if the column contains guids.
@@ -120,17 +123,17 @@ The next sections describe each operation and their details.
 
 The library allows you to insert data either one row at a time, or several rows together.
 
-To insert a single row, create a `SingleInsertContext` object, with arguments the list of columns for which you provide a value. The following example inserts a new row in the *Test0* table, providing the value for the *column_guid* column but not for other columns.
+To insert a single row, create an `InsertContext` object, with arguments the list of columns for which you provide a value. The following example inserts a new row in the *Test0* table, providing the value for the *column_guid* column but not for other columns.
 
   ```cs
-  ISingleInsertResult InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, new Guid("{1BA0D7E9-039F-44E6-A966-CC67AC01A65D}")) }));
+  IInsertResult InsertResult = Database.Run(new InsertContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, new Guid("{1BA0D7E9-039F-44E6-A966-CC67AC01A65D}")) }));
   ```
 
-To insert more than one row, you can use a `MultiInsertContext` object. This object takes the number of rows you want to insert, and for each of them a `IColumnValueCollectionPair` that will list all values for that row. Note that all value lists must have exactly as many values as rows inserted. If you want to keep some rows without values, you will need a more complicated sequence, for example by inserting each row seperately with a `SingleInsertContext`.
+To insert more than one row, provide the number of rows you want to insert, and for each of them a `IColumnValueCollectionPair` that will list all values for that row. Note that all value lists must have exactly as many values as rows inserted. If you want to keep some rows without values, you will need a more complicated sequence, for example by inserting each row seperately.
 The following example inserts three rows, with guids `guidKey0`, `guidKey1` and `guidKey2` (not explicited here, for clarity).
 
   ```cs
-  IMultiInsertResult InsertResult = Database.Run(new MultiInsertContext(TestSchema.Test0, 3, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<Guid>(TestSchema.Test0_Guid, new List<Guid>() { guidKey0, guidKey1, guidKey2 }), }));
+  IInsertResult InsertResult = Database.Run(new InsertContext(TestSchema.Test0, 3, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<Guid>(TestSchema.Test0_Guid, new List<Guid>() { guidKey0, guidKey1, guidKey2 }), }));
   ```
 
 ## Updating data
@@ -162,8 +165,44 @@ Deleting rows has more options. When performing a delete operation, you can set 
 Deleting rows also has the following options: 
 
 1. Delete all rows in a table
+  ```cs
+  Database.Run(new DeleteContext(TestSchema.Test0, 0));
+  ```
 2. Delete rows for which a column has a specific value
+  ```cs
+  Database.Run(new DeleteContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty), 1234));
+  ```
 3. Delete rows for which several columns each have a specific value
+  ```cs
+  Database.Run(new DeleteContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey2), new ColumnValuePair<int>(TestSchema.Test0_Int, 10) }, 0));
+  ```
 3. Delete rows for which a column has a one value among many.
+  ```cs
+  Database.Run(new DeleteContext(TestSchema.Test0, new ColumnValueCollectionPair<Guid>(TestSchema.Test0_Guid, new List<Guid>() { guidKey0, guidKey1 }), 2));
+  ```
+## Selecting data
 
+Data query can be done on a single table or on several tables using one or more LEFT JOIN. The single table case is done using a SingleQueryContext object, with a parameter specifying the table to query. In addition, you have two optional parameters that you can mix freely:
+
+1. A set of constraints specifying that either one or more colums must have a specific value, or that one column can have any of a collection of values.
+2. A set of columns to return.
+
+For example, the following operation queries values of *column_guid* for every rows where *column_int* is `2` or `3`.
+
+  ```cs
+  SelectResult = Database.Run(new SingleQueryContext(TestSchema.Test0, new ColumnValueCollectionPair<int>(TestSchema.Test0_Int, new List<int>() { 2, 3 }), new List<IColumnDescriptor>() { TestSchema.Test0_Guid }));
+  ```
+
+To read several tables, use a JoinQueryContext and connect columns of different tables with a dictionary:
+
+  ```cs
+  Dictionary<IColumnDescriptor, IColumnDescriptor> Join = new Dictionary<IColumnDescriptor, IColumnDescriptor>()
+  {
+    { TestSchema.Test1_Int, TestSchema.Test0_Int },
+  };
+  SelectResult = Database.Run(new JoinQueryContext(Join, new List<IColumnDescriptor>() { TestSchema.Test1_String, TestSchema.Test0_Guid }));
+  ```
+
+The example above returns values of *column_string* in table *test1*, and *column_guid* in table *test0*, where *column_int* is the same in both tables.
+ 
 

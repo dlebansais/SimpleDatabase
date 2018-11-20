@@ -27,6 +27,12 @@ namespace TestDebug
             ICredential Credential = new Credential("localhost", "test", "test", TestSchema);
 
             bool Success;
+            List<IResultRow> RowList;
+            IInsertResult InsertResult;
+            IDeleteResult DeleteResult;
+            IJoinQueryResult QueryResult;
+            IUpdateResult UpdateResult;
+            ISingleQueryResult SelectResult;
 
             Success = Database.IsCredentialValid(Credential);
             Success = Database.CreateCredential(RootId, RootPassword, Credential);
@@ -34,18 +40,33 @@ namespace TestDebug
             Success = Database.CreateTables(Credential);
             Success = Database.Open(Credential);
 
-            IDeleteResult DeleteResult;
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test0, 0));
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test1, 0));
 
-            IInsertResult InsertResult = Database.Run(new InsertContext(TestSchema.Test0, new List<ColumnValuePair<Guid>>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty) }));
+            InsertResult = Database.Run(new InsertContext(TestSchema.Test0, 3, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<Guid>(TestSchema.Test0_Guid, new List<Guid>() { guidKey0, guidKey1, guidKey2 }) }));
+            UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey1), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 2) }));
+            UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey2), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 3) }));
 
-            Database.Close();
-            Database.DeleteTables(Credential);
-            Database.DeleteCredential(RootId, RootPassword, Credential);
+            SelectResult = Database.Run(new SingleQueryContext(TestSchema.Test0, new List<IColumnDescriptor>() { TestSchema.Test0_Guid, TestSchema.Test0_Int }));
+            RowList = new List<IResultRow>(SelectResult.RowList);
 
-            Database.Open(Credential);
-            IDeleteResult SingleDeleteResult = Database.Run(new DeleteContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty), 0));
+            SelectResult = Database.Run(new SingleQueryContext(TestSchema.Test0, new ColumnValueCollectionPair<int>(TestSchema.Test0_Int, new List<int>() { 3 }), new List<IColumnDescriptor>() { TestSchema.Test0_Guid, TestSchema.Test0_Int }));
+            RowList = new List<IResultRow>(SelectResult.RowList);
+            TestSchema.Test0_Int.TryParseRow(RowList[0], out int Test0_Row_0_1);
+
+
+
+            InsertResult = Database.Run(new InsertContext(TestSchema.Test0, 3, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<Guid>(TestSchema.Test0_Guid, new List<Guid>() { guidKey0, guidKey1, guidKey2 }) }));
+            InsertResult = Database.Run(new InsertContext(TestSchema.Test1, 4, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<string>(TestSchema.Test1_String, new List<string>() { "row 0", "row 1", "row 2", "row 3" }) }));
+            UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey1), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 2) }));
+            UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey2), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 3) }));
+
+            Dictionary<IColumnDescriptor, IColumnDescriptor> Join = new Dictionary<IColumnDescriptor, IColumnDescriptor>()
+            {
+                { TestSchema.Test1_Int, TestSchema.Test0_Int },
+            };
+            QueryResult = Database.Run(new JoinQueryContext(Join, new List<IColumnDescriptor>() { TestSchema.Test1_String, TestSchema.Test0_Guid }));
+
 
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test0, 0));
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test1, 0));
