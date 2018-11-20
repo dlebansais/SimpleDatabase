@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -286,7 +285,6 @@ namespace Database
         /// </parameters>
         public virtual void Initialize(ConnectorType connectorType, ConnectionOption connectionOption)
         {
-            Contract.Requires(Connector == null);
             Debug.Assert(Connector == null);
             if (Connector != null)
                 return;
