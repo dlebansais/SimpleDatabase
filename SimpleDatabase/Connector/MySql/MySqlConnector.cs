@@ -428,7 +428,7 @@ namespace Database.Internal
         }
         #endregion
 
-        #region Multi Insert
+        #region Insert
         public override IActiveOperation<IInsertResultInternal> Insert(IInsertContext context)
         {
             if (ServerVersionMajor < 8)
@@ -462,7 +462,7 @@ namespace Database.Internal
         }
         #endregion
 
-        #region Multi Row Delete
+        #region Delete
         public override IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context)
         {
             IMySqlDeleteOperation Operation = new MySqlDeleteOperation(context);

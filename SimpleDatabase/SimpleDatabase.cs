@@ -683,7 +683,7 @@ namespace Database
         }
         #endregion
 
-        #region Multi Insert
+        #region Insert
         /// <summary>
         ///     Executes a request to insert several values in a table.
         /// </summary>
@@ -742,7 +742,7 @@ namespace Database
         }
         #endregion
 
-        #region Multi Row Delete
+        #region Delete
         /// <summary>
         ///     Executes a request to delete rows in a table, with constraints.
         /// </summary>
