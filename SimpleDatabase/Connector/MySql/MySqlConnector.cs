@@ -429,7 +429,7 @@ namespace Database.Internal
         #endregion
 
         #region Multi Insert
-        public override IActiveOperation<IMultiInsertResultInternal> MultiInsert(IMultiInsertContext context)
+        public override IActiveOperation<IInsertResultInternal> Insert(IInsertContext context)
         {
             if (ServerVersionMajor < 8)
             {
@@ -444,10 +444,10 @@ namespace Database.Internal
                     }
 
                 if (!HasPrimary && (PrimaryKey is IColumnDescriptorGuid))
-                    return new ActiveOperation<IMultiInsertResultInternal>(new MultiInsertResult(false));
+                    return new ActiveOperation<IInsertResultInternal>(new InsertResult(false));
             }
 
-            IMySqlMultiInsertOperation Operation = new MySqlMultiInsertOperation(context);
+            IMySqlInsertOperation Operation = new MySqlInsertOperation(context);
             IReadOnlyCollection<IColumnValueCollectionPair<byte[]>> DataCollectionEntryList = Operation.GetDataEntryList();
 
             List<IColumnValuePair<byte[]>> DataEntryList = new List<IColumnValuePair<byte[]>>();
@@ -455,10 +455,10 @@ namespace Database.Internal
                 foreach (byte[] Value in Entry.ValueCollection)
                     DataEntryList.Add(new ColumnValuePair<byte[]>(Entry.Column, Value));
 
-            return PrepareNonQueryOperationWithParameter<IMultiInsertContext, IMySqlMultiInsertOperation, IMultiInsertOperation, IMultiInsertResult, IMultiInsertResultInternal>(
+            return PrepareNonQueryOperationWithParameter<IInsertContext, IMySqlInsertOperation, IInsertOperation, IInsertResult, IInsertResultInternal>(
                 Operation, DataEntryList,
-                (IMultiInsertOperation operation, IAsyncResult asyncResult) => new MultiInsertResult(operation, asyncResult),
-                (MySqlCommand command, IMultiInsertResultInternal result) => Operation.FinalizeOperation(command, result));
+                (IInsertOperation operation, IAsyncResult asyncResult) => new InsertResult(operation, asyncResult),
+                (MySqlCommand command, IInsertResultInternal result) => Operation.FinalizeOperation(command, result));
         }
         #endregion
 

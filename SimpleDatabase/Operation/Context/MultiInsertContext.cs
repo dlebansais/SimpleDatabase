@@ -7,7 +7,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request to insert several values in a table.
     /// </summary>
-    public interface IMultiInsertContext : ISingleTableOperationContext, IModifyContext, IDataContext
+    public interface IInsertContext : ISingleTableOperationContext, IModifyContext, IDataContext
     {
         /// <summary>
         ///     Gets the number of values to insert.
@@ -29,11 +29,11 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request to insert several values in a table.
     /// </summary>
-    public class MultiInsertContext : SingleTableOperationContext, IMultiInsertContext
+    public class InsertContext : SingleTableOperationContext, IInsertContext
     {
         #region Init
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiInsertContext"/> class.
+        ///     Initializes a new instance of the <see cref="InsertContext"/> class.
         ///     This instance will insert a single row.
         ///     Creating a request with zero columns is valid, and the corresponding operation will always return success immediately.
         /// </summary>
@@ -47,7 +47,7 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="entryList"/> is null.
         /// </exception>
-        public MultiInsertContext(ITableDescriptor table, IEnumerable<IColumnValuePair> entryList)
+        public InsertContext(ITableDescriptor table, IEnumerable<IColumnValuePair> entryList)
             : base(table)
         {
             if (entryList == null)
@@ -62,7 +62,7 @@ namespace Database
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiInsertContext"/> class.
+        ///     Initializes a new instance of the <see cref="InsertContext"/> class.
         ///     Creating a request with zero rows or columns is valid, and the corresponding operation will always return success immediately.
         /// </summary>
         /// <parameters>
@@ -82,7 +82,7 @@ namespace Database
         /// <exception cref="ArgumentException">
         ///     One of the columns in <paramref name="entryList"/> does not have exactly <paramref name="rowCount"/> values to insert.
         /// </exception>
-        public MultiInsertContext(ITableDescriptor table, int rowCount, IEnumerable<IColumnValueCollectionPair> entryList)
+        public InsertContext(ITableDescriptor table, int rowCount, IEnumerable<IColumnValueCollectionPair> entryList)
             : base(table)
         {
             if (rowCount < 0)

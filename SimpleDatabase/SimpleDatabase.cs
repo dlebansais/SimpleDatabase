@@ -212,9 +212,9 @@ namespace Database
         /// <returns>
         ///     The request result.
         /// </returns>
-        IMultiInsertResult Run(IMultiInsertContext context);
+        IInsertResult Run(IInsertContext context);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        Task<IMultiInsertResult> RunAsync(IMultiInsertContext context);
+        Task<IInsertResult> RunAsync(IInsertContext context);
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
@@ -693,7 +693,7 @@ namespace Database
         /// <returns>
         ///     The request result.
         /// </returns>
-        public IMultiInsertResult Run(IMultiInsertContext context)
+        public IInsertResult Run(IInsertContext context)
         {
             Debug.Assert(Connector != null);
             Debug.Assert(Connector.IsOpen);
@@ -701,7 +701,7 @@ namespace Database
             return Execute(context);
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public Task<IMultiInsertResult> RunAsync(IMultiInsertContext context)
+        public Task<IInsertResult> RunAsync(IInsertContext context)
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             Debug.Assert(Connector != null);
@@ -720,16 +720,16 @@ namespace Database
         /// <returns>
         ///     The request result.
         /// </returns>
-        protected virtual IMultiInsertResult Execute(IMultiInsertContext context)
+        protected virtual IInsertResult Execute(IInsertContext context)
         {
             if (!IsOperationThreadStarted)
-                return new MultiInsertResult(false);
+                return new InsertResult(false);
 
             if (context.RowCount == 0 || context.EntryList.Count == 0)
-                return new MultiInsertResult(true);
+                return new InsertResult(true);
 
-            IActiveOperation<IMultiInsertResultInternal> ActiveOperation = Connector.MultiInsert(context);
-            IMultiInsertResultInternal Result = ActiveOperation.Result;
+            IActiveOperation<IInsertResultInternal> ActiveOperation = Connector.Insert(context);
+            IInsertResultInternal Result = ActiveOperation.Result;
 
             if (Result.IsStarted)
             {

@@ -38,7 +38,7 @@ namespace TestDebug
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test0, 0));
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test1, 0));
 
-            IMultiInsertResult InsertResult = Database.Run(new MultiInsertContext(TestSchema.Test0, new List<ColumnValuePair<Guid>>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty) }));
+            IInsertResult InsertResult = Database.Run(new InsertContext(TestSchema.Test0, new List<ColumnValuePair<Guid>>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty) }));
 
             Database.Close();
             Database.DeleteTables(Credential);

@@ -7,14 +7,14 @@ using System.Diagnostics;
 
 namespace Database.Internal
 {
-    internal interface IMySqlMultiInsertOperation : IMultiInsertOperation, IMySqlModifyOperation<IMultiInsertContext, IMultiInsertResultInternal>
+    internal interface IMySqlInsertOperation : IInsertOperation, IMySqlModifyOperation<IInsertContext, IInsertResultInternal>
     {
     }
 
-    internal class MySqlMultiInsertOperation : MultiInsertOperation, IMySqlMultiInsertOperation
+    internal class MySqlInsertOperation : InsertOperation, IMySqlInsertOperation
     {
         #region Init
-        public MySqlMultiInsertOperation(IMultiInsertContext context)
+        public MySqlInsertOperation(IInsertContext context)
             : base(context)
         {
         }
@@ -47,7 +47,7 @@ namespace Database.Internal
             return Result;
         }
 
-        public virtual string FinalizeOperation(MySqlCommand Command, IMultiInsertResultInternal Result)
+        public virtual string FinalizeOperation(MySqlCommand Command, IInsertResultInternal Result)
         {
             IColumnValuePair LastCreatedKeyId = null;
             string Diagnostic;
@@ -165,7 +165,7 @@ namespace Database.Internal
             ValueStringList = StringList;
         }
 
-        protected virtual IColumnValuePair GetLastCreatedKeyId(MySqlCommand command, IMultiInsertResultInternal result)
+        protected virtual IColumnValuePair GetLastCreatedKeyId(MySqlCommand command, IInsertResultInternal result)
         {
             ITableDescriptor Table = Context.Table;
             IReadOnlyCollection<IColumnValueCollectionPair> ColumnInitialValues = Context.EntryList;
