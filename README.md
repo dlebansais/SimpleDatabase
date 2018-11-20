@@ -9,6 +9,34 @@ A C# layer over MySql for basic operations. Strongly typed, async, nothrow.
 
 ![Build Status](https://img.shields.io/travis/dlebansais/SimpleDatabase/master.svg)
 
+This class library provides access to databases seen as collections and dictionaries of schemas, tables, columns and rows. The object-oriented part appears when one adds custom data types.
+
+The library is strongly typed in that, if a column in the data contains data of a given type, all C# code using the library manipulate variables of that type, and no 'object' or 'var' is involved.
+Every operation other than setting up the environment has an xxAsync version that can be plugged to user interface as any other async method.
+
+When possible, methods of the library will not throw any exception. This doesn't apply to invalid arguments, although some combination of arguments can lead to invalid SQL text but may not be caught when the operation is initiated.
+
+## Example
+
+The code below provides a simple example of how to use the library. More complete examples are provided later, this example is just intended to help the reader check if this is what they are looking for.
+
+    ISimpleDatabase Database = new SimpleDatabase();
+    Database.Initialize(ConnectorType.MySql, ConnectionOption.KeepAlive);
+    
+    ITestSchema TestSchema = new TestSchema();
+    ICredential Credential = new Credential("localhost", "test", "test", TestSchema);
+    
+    Database.Open(Credential);
+
+    ISingleInsertContext InsertContext = 
+        new SingleInsertContext(TestSchema.mytest, 
+                                new List<IColumnValuePair>() 
+                                   { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, myguid) })
+
+    ISingleInsertResult InsertResult = Database.Run(InsertContext);
+    
+The code above opens the database and insert a new row with guid value `myguid` in the `mytest` table.
+
 # Reference
 
 ## Defining your database
