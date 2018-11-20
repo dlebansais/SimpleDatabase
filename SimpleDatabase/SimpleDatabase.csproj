@@ -115,7 +115,7 @@
     <Compile Include="Connector\MySql\Operation\MySqlModifyOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlMultiInsertOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlMultiQueryOperation.cs" />
-    <Compile Include="Connector\MySql\Operation\MySqlMultiRowDeleteOperation.cs" />
+    <Compile Include="Connector\MySql\Operation\MySqlDeleteOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlQueryOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlSingleInsertOperation.cs" />
@@ -130,7 +130,7 @@
     <Compile Include="Operation\Context\MultiInsertContext.cs" />
     <Compile Include="Operation\Context\MultiQueryContext.cs" />
     <Compile Include="Operation\Context\MultiRowConstrainableContext.cs" />
-    <Compile Include="Operation\Context\MultiRowDeleteContext.cs" />
+    <Compile Include="Operation\Context\DeleteContext.cs" />
     <Compile Include="Operation\Context\MultiTableConstrainableContext.cs" />
     <Compile Include="Operation\Context\MultiTableOperationContext.cs" />
     <Compile Include="Operation\Context\QueryContext.cs" />
@@ -143,7 +143,7 @@
     <Compile Include="Operation\ModifyOperation.cs" />
     <Compile Include="Operation\MultiInsertOperation.cs" />
     <Compile Include="Operation\MultiQueryOperation.cs" />
-    <Compile Include="Operation\MultiRowDeleteOperation.cs" />
+    <Compile Include="Operation\DeleteOperation.cs" />
     <Compile Include="Operation\Operation.cs" />
     <Compile Include="Operation\QueryOperation.cs" />
     <Compile Include="Operation\Result\DataResult.cs" />
@@ -151,7 +151,7 @@
     <Compile Include="Operation\Result\ModifyResult.cs" />
     <Compile Include="Operation\Result\MultiInsertResult.cs" />
     <Compile Include="Operation\Result\MultiQueryResult.cs" />
-    <Compile Include="Operation\Result\MultiRowDeleteResult.cs" />
+    <Compile Include="Operation\Result\DeleteResult.cs" />
     <Compile Include="Operation\Result\QueryResult.cs" />
     <Compile Include="Operation\Result\Result.cs" />
     <Compile Include="Operation\Result\SingleInsertResult.cs" />
