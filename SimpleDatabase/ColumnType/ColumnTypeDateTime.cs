@@ -9,6 +9,13 @@ namespace Database.Types
     /// </summary>
     public interface IColumnTypeDateTime : IColumnTypeBase<DateTime>
     {
+        /// <summary>
+        ///     Indicates if the DateTime type is stored as a tick count.
+        /// </summary>
+        /// <returns>
+        ///     True if the DateTime type is stored as a tick count.
+        /// </returns>
+        bool DateTimeAsTicks { get; }
     }
     #endregion
 
@@ -17,14 +24,35 @@ namespace Database.Types
     /// </summary>
     public class ColumnTypeDateTime : ColumnTypeBase<DateTime>, IColumnTypeDateTime
     {
+        #region Init
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ColumnTypeDateTime"/> class and adds it to the table it belongs to.
+        /// </summary>
+        /// <parameters>
+        /// <param name="dateTimeAsTicks">Indicates if the DateTime type is stored as a tick count.</param>
+        /// </parameters>
+        public ColumnTypeDateTime(bool dateTimeAsTicks)
+        {
+            DateTimeAsTicks = dateTimeAsTicks;
+        }
+        #endregion
+
         #region Properties
+        /// <summary>
+        ///     Indicates if the DateTime type is stored as a tick count.
+        /// </summary>
+        /// <returns>
+        ///     True if the DateTime type is stored as a tick count.
+        /// </returns>
+        public bool DateTimeAsTicks { get; }
+
         /// <summary>
         ///     Gets the underlying SQL type.
         /// </summary>
         /// <returns>
         ///     The underlying SQL type.
         /// </returns>
-        public override string SqlType { get { return "BIGINT"; } }
+        public override string SqlType { get { return DateTimeAsTicks ? "BIGINT" : "DATETIME"; } }
         #endregion
 
         #region Client Interface
@@ -39,7 +67,10 @@ namespace Database.Types
         /// </returns>
         public override string ToSqlFormat(DateTime value)
         {
-            return value.Ticks.ToString();
+            if (DateTimeAsTicks)
+                return value.Ticks.ToString();
+            else
+                return value.ToString();
         }
 
         /// <summary>
@@ -53,9 +84,18 @@ namespace Database.Types
         /// </returns>
         public override DateTime FromSqlFormat(object sqlValue)
         {
-            Debug.Assert(sqlValue is long);
-            if (sqlValue is long)
-                return new DateTime((long)sqlValue);
+            if (DateTimeAsTicks)
+            {
+                Debug.Assert(sqlValue is long);
+                if (sqlValue is long)
+                    return new DateTime((long)sqlValue);
+            }
+            else
+            {
+                Debug.Assert(sqlValue is DateTime);
+                if (sqlValue is DateTime)
+                    return (DateTime)sqlValue;
+            }
 
             return default;
         }

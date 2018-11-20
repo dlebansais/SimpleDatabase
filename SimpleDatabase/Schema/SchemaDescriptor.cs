@@ -26,6 +26,14 @@ namespace Database
         ///     The tables belonging to this schema.
         /// </returns>
         IReadOnlyDictionary<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>> Tables { get; }
+
+        /// <summary>
+        ///     Indicates if the DateTime type is stored as a tick count.
+        /// </summary>
+        /// <returns>
+        ///     True if the DateTime type is stored as a tick count.
+        /// </returns>
+        bool DateTimeAsTicks { get; }
     }
     #endregion
 
@@ -52,6 +60,23 @@ namespace Database
             Tables = new ReadOnlyDictionary<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>>(WriteableTables);
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SchemaDescriptor"/> class.
+        ///     Tables are added to this schema when <see cref="ITableDescriptor"/> objects are created.
+        /// </summary>
+        /// <parameters>
+        /// <param name="name">The schema name.</param>
+        /// <param name="dateTimeAsTicks">Indicates if the DateTime type is stored as a tick count.</param>
+        /// </parameters>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="name"/> is null or empty.
+        /// </exception>
+        public SchemaDescriptor(string name, bool dateTimeAsTicks)
+            : this(name)
+        {
+            DateTimeAsTicks = dateTimeAsTicks;
+        }
+
         internal void AddTable(ITableDescriptor table)
         {
             WriteableTables.Add(table, new List<IColumnDescriptor>());
@@ -75,6 +100,14 @@ namespace Database
         /// </returns>
         public IReadOnlyDictionary<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>> Tables { get; }
         private IDictionary<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>> WriteableTables;
+
+        /// <summary>
+        ///     Indicates if the DateTime type is stored as a tick count.
+        /// </summary>
+        /// <returns>
+        ///     True if the DateTime type is stored as a tick count.
+        /// </returns>
+        public bool DateTimeAsTicks { get; }
         #endregion
     }
 }

@@ -31,7 +31,7 @@ namespace Database.Types
         ///     <paramref name="name"/> is null or empty.
         /// </exception>
         public ColumnDescriptorDateTime(ITableDescriptor table, string name)
-            : base(table, name, new ColumnTypeDateTime())
+            : base(table, name, new ColumnTypeDateTime(table.Schema.DateTimeAsTicks))
         {
         }
         #endregion

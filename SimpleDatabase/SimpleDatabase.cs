@@ -923,11 +923,11 @@ namespace Database
         ///     Releases the unmanaged resources used by the <see cref="SimpleDatabase"/> and optionally releases the managed resources.
         /// </summary>
         /// <parameters>
-        /// <param name="IsDisposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        /// <param name="isDisposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         /// </parameters>
-        protected virtual void Dispose(bool IsDisposing)
+        protected virtual void Dispose(bool isDisposing)
         {
-            if (IsDisposing)
+            if (isDisposing)
                 DisposeNow();
         }
 
