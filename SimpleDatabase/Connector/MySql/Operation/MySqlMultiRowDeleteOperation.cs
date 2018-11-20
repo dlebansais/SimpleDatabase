@@ -82,7 +82,7 @@ namespace Database.Internal
 
                 string FormattedValue = ColumnType.ToSqlFormat(Value);
 
-                ConstraintString += "(" + ColumnName + "=" + FormattedValue + ")";
+                ConstraintString += $"({ColumnName}={FormattedValue})";
             }
 
             return ConstraintString;
@@ -107,7 +107,7 @@ namespace Database.Internal
                     ConstraintString += " AND ";
 
                 string FormattedValue = ColumnType.ToSqlFormat(Value);
-                ConstraintString += "(" + ColumnName + "=" + FormattedValue + ")";
+                ConstraintString += $"({ColumnName}={FormattedValue})";
             }
 
             return ConstraintString;
