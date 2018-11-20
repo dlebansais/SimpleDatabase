@@ -467,16 +467,6 @@ namespace Database.Internal
         }
         #endregion
 
-        #region Single Row Delete
-        public override IActiveOperation<ISingleRowDeleteResultInternal> SingleRowDelete(ISingleRowDeleteContext context)
-        {
-            IMySqlSingleRowDeleteOperation Operation = new MySqlSingleRowDeleteOperation(context);
-            return PrepareNonQueryOperation<ISingleRowDeleteContext, IMySqlSingleRowDeleteOperation, ISingleRowDeleteOperation, ISingleRowDeleteResult, ISingleRowDeleteResultInternal>(
-                Operation, (ISingleRowDeleteOperation operation, IAsyncResult asyncResult) => new SingleRowDeleteResult(operation, asyncResult),
-                (MySqlCommand command, ISingleRowDeleteResultInternal result) => Operation.FinalizeOperation(command, result));
-        }
-        #endregion
-
         #region Multi Row Delete
         public override IActiveOperation<IMultiRowDeleteResultInternal> MultiRowDelete(IMultiRowDeleteContext context)
         {

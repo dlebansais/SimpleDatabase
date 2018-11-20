@@ -232,20 +232,6 @@ namespace Database
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
-        ///     Executes a request to delete rows in a table, with constraints on some values.
-        /// </summary>
-        /// <parameters>
-        /// <param name="context">Description of the request.</param>
-        /// </parameters>
-        /// <returns>
-        ///     The request result.
-        /// </returns>
-        ISingleRowDeleteResult Run(ISingleRowDeleteContext context);
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        Task<ISingleRowDeleteResult> RunAsync(ISingleRowDeleteContext context);
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-
-        /// <summary>
         ///     Executes a request to delete rows in a table, with constraints.
         /// </summary>
         /// <parameters>
@@ -817,62 +803,6 @@ namespace Database
 
             IActiveOperation<IMultiInsertResultInternal> ActiveOperation = Connector.MultiInsert(context);
             IMultiInsertResultInternal Result = ActiveOperation.Result;
-
-            if (Result.IsStarted)
-            {
-                ActiveOperationTable.Add(ActiveOperation);
-                NewOperationEvent.Set();
-                Result.WaitCompleted();
-            }
-
-            return Result;
-        }
-        #endregion
-
-        #region Single Row Delete
-        /// <summary>
-        ///     Executes a request to delete rows in a table, with constraints on some values.
-        /// </summary>
-        /// <parameters>
-        /// <param name="context">Description of the request.</param>
-        /// </parameters>
-        /// <returns>
-        ///     The request result.
-        /// </returns>
-        public ISingleRowDeleteResult Run(ISingleRowDeleteContext context)
-        {
-            Debug.Assert(Connector != null);
-            Debug.Assert(Connector.IsOpen);
-
-            return Execute(context);
-        }
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public Task<ISingleRowDeleteResult> RunAsync(ISingleRowDeleteContext context)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            Debug.Assert(Connector != null);
-            Debug.Assert(Connector.IsOpen);
-
-            return Task.Run(() => Execute(context));
-        }
-
-        /// <summary>
-        ///     Executes a request to delete rows in a table, with constraints on some values.
-        ///     This is the synchronous implementation.
-        /// </summary>
-        /// <parameters>
-        /// <param name="context">Description of the request.</param>
-        /// </parameters>
-        /// <returns>
-        ///     The request result.
-        /// </returns>
-        protected virtual ISingleRowDeleteResult Execute(ISingleRowDeleteContext context)
-        {
-            if (!IsOperationThreadStarted)
-                return new SingleRowDeleteResult(false);
-
-            IActiveOperation<ISingleRowDeleteResultInternal> ActiveOperation = Connector.SingleRowDelete(context);
-            ISingleRowDeleteResultInternal Result = ActiveOperation.Result;
 
             if (Result.IsStarted)
             {

@@ -45,7 +45,7 @@ namespace TestDebug
             Database.DeleteCredential(RootId, RootPassword, Credential);
 
             Database.Open(Credential);
-            ISingleRowDeleteResult SingleDeleteResult = Database.Run(new SingleRowDeleteContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty)));
+            IMultiRowDeleteResult SingleDeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty), 0));
 
             DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test0, 0));
             DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test1, 0));
