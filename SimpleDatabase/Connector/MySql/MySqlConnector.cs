@@ -406,13 +406,13 @@ namespace Database.Internal
         #endregion
 
         #region Multi Query
-        public override IActiveOperation<IMultiQueryResultInternal> MultiQuery(IMultiQueryContext context)
+        public override IActiveOperation<IJoinQueryResultInternal> JoinQuery(IJoinQueryContext context)
         {
-            IMySqlMultiQueryOperation Operation = new MySqlMultiQueryOperation(context);
-            return PrepareReaderOperation<IMultiQueryContext, IMySqlMultiQueryOperation, IMultiQueryOperation, IMultiQueryResult, IMultiQueryResultInternal>(
+            IMySqlJoinQueryOperation Operation = new MySqlJoinQueryOperation(context);
+            return PrepareReaderOperation<IJoinQueryContext, IMySqlJoinQueryOperation, IJoinQueryOperation, IJoinQueryResult, IJoinQueryResultInternal>(
                 Operation, 
-                (IMultiQueryOperation operation, IAsyncResult asyncResult) => new MultiQueryResult(operation, asyncResult),
-                (MySqlCommand command, IMultiQueryResultInternal result) => Operation.FinalizeOperation(command, result));
+                (IJoinQueryOperation operation, IAsyncResult asyncResult) => new JoinQueryResult(operation, asyncResult),
+                (MySqlCommand command, IJoinQueryResultInternal result) => Operation.FinalizeOperation(command, result));
         }
         #endregion
 

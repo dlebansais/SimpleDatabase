@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 namespace Database.Internal
 {
-    internal interface IMySqlMultiQueryOperation : IMultiQueryOperation, IMySqlQueryOperation<IMultiQueryContext, IMultiQueryResultInternal>
+    internal interface IMySqlJoinQueryOperation : IJoinQueryOperation, IMySqlQueryOperation<IJoinQueryContext, IJoinQueryResultInternal>
     {
     }
 
-    internal class MySqlMultiQueryOperation : MultiQueryOperation, IMySqlMultiQueryOperation
+    internal class MySqlJoinQueryOperation : JoinQueryOperation, IMySqlJoinQueryOperation
     {
         #region Init
-        public MySqlMultiQueryOperation(IMultiQueryContext context)
+        public MySqlJoinQueryOperation(IJoinQueryContext context)
             : base(context)
         {
         }
@@ -34,7 +34,7 @@ namespace Database.Internal
             return Result + ";";
         }
 
-        public virtual string FinalizeOperation(MySqlCommand Command, IMultiQueryResultInternal Result)
+        public virtual string FinalizeOperation(MySqlCommand Command, IJoinQueryResultInternal Result)
         {
             try
             {

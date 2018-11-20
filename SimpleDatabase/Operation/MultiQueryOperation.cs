@@ -1,13 +1,13 @@
 ﻿namespace Database.Internal
 {
-    internal interface IMultiQueryOperation : IQueryOperation<IMultiQueryContext, IMultiQueryResult>, IQueryOperation
+    internal interface IJoinQueryOperation : IQueryOperation<IJoinQueryContext, IJoinQueryResult>, IQueryOperation
     {
     }
 
-    internal class MultiQueryOperation : QueryOperation<IMultiQueryContext, IMultiQueryResult>, IMultiQueryOperation
+    internal class JoinQueryOperation : QueryOperation<IJoinQueryContext, IJoinQueryResult>, IJoinQueryOperation
     {
         #region Init
-        public MultiQueryOperation(IMultiQueryContext context)
+        public JoinQueryOperation(IJoinQueryContext context)
             : base(context)
         {
         }

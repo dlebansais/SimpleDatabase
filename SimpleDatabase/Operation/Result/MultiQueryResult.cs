@@ -6,25 +6,25 @@ namespace Database
     /// <summary>
     ///     Represents the result of a request to query values from several tables.
     /// </summary>
-    public interface IMultiQueryResult : IQueryResult
+    public interface IJoinQueryResult : IQueryResult
     {
     }
 }
 
 namespace Database.Internal
 {
-    internal interface IMultiQueryResultInternal : IQueryResultInternal, IMultiQueryResult
+    internal interface IJoinQueryResultInternal : IQueryResultInternal, IJoinQueryResult
     {
     }
 
-    internal class MultiQueryResult : QueryResult, IMultiQueryResultInternal
+    internal class JoinQueryResult : QueryResult, IJoinQueryResultInternal
     {
-        public MultiQueryResult(IMultiQueryOperation operation, IAsyncResult asyncResult)
+        public JoinQueryResult(IJoinQueryOperation operation, IAsyncResult asyncResult)
             : base(operation, asyncResult)
         {
         }
 
-        public MultiQueryResult(bool success)
+        public JoinQueryResult(bool success)
             : base(success)
         {
         }

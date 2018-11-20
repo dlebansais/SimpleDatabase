@@ -7,7 +7,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request over several tables.
     /// </summary>
-    public interface IMultiTableOperationContext : IContext
+    public interface IJoinOperationContext : IContext
     {
         /// <summary>
         ///     Gets the join describing how tables are connected in the query.
@@ -21,20 +21,20 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request over several tables.
     /// </summary>
-    public class MultiTableOperationContext : Context, IMultiTableOperationContext
+    public class JoinOperationContext : Context, IJoinOperationContext
     {
         #region Init
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiTableOperationContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinOperationContext"/> class.
         ///     This instance has no join and addresses only one table.
         /// </summary>
-        public MultiTableOperationContext()
+        public JoinOperationContext()
         {
             Join = new Dictionary<IColumnDescriptor, IColumnDescriptor>();
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiTableOperationContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinOperationContext"/> class.
         /// </summary>
         /// <parameters>
         /// <param name="join">The join describing how tables are connected in the request.</param>
@@ -45,7 +45,7 @@ namespace Database
         /// <exception cref="ArgumentException">
         ///     <paramref name="join"/> does not describe a valid join.
         /// </exception>
-        public MultiTableOperationContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join)
+        public JoinOperationContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join)
         {
             Join = join ?? throw new ArgumentNullException(nameof(join));
             if (!IsJoinValid(join))

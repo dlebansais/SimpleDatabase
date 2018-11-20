@@ -7,7 +7,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request over several tables, with constraints.
     /// </summary>
-    public interface IMultiTableConstrainableContext : IMultiTableOperationContext
+    public interface IJoinConstrainableContext : IJoinOperationContext
     {
         /// <summary>
         ///     Gets the constraints associated to this request.
@@ -21,22 +21,22 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request over several tables, with constraints.
     /// </summary>
-    public class MultiTableConstrainableContext : MultiTableOperationContext, IMultiTableConstrainableContext
+    public class JoinConstrainableContext : JoinOperationContext, IJoinConstrainableContext
     {
         #region Init
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiTableConstrainableContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinConstrainableContext"/> class.
         ///     This instance has no join and addresses only one table.
         ///     This request has no constraints.
         /// </summary>
-        public MultiTableConstrainableContext()
+        public JoinConstrainableContext()
             : base()
         {
             Constraints = new Dictionary<ITableDescriptor, IColumnValueCollectionPair>();
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiTableConstrainableContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinConstrainableContext"/> class.
         ///     This request has no constraints.
         /// </summary>
         /// <parameters>
@@ -48,14 +48,14 @@ namespace Database
         /// <exception cref="ArgumentException">
         ///     <paramref name="join"/> does not describe a valid join.
         /// </exception>
-        public MultiTableConstrainableContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join)
+        public JoinConstrainableContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join)
             : base(join)
         {
             Constraints = new Dictionary<ITableDescriptor, IColumnValueCollectionPair>();
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiTableConstrainableContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinConstrainableContext"/> class.
         ///     This instance has no join and addresses only one table.
         ///     Each <see cref="IColumnValueCollectionPair"/> in <paramref name="constraintList"/> describes a list of values in a column.
         ///     A row is a match if all columns contain at least one of the listed values.
@@ -66,7 +66,7 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="constraintList"/> is null.
         /// </exception>
-        public MultiTableConstrainableContext(IEnumerable<IColumnValueCollectionPair> constraintList)
+        public JoinConstrainableContext(IEnumerable<IColumnValueCollectionPair> constraintList)
             : base()
         {
             if (constraintList == null)
@@ -76,7 +76,7 @@ namespace Database
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiTableConstrainableContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinConstrainableContext"/> class.
         ///     Each <see cref="IColumnValueCollectionPair"/> in <paramref name="constraintList"/> describes a list of values in a column.
         ///     A row is a match if all columns contain at least one of the listed values.
         /// </summary>
@@ -93,7 +93,7 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="constraintList"/> is null.
         /// </exception>
-        public MultiTableConstrainableContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnValueCollectionPair> constraintList)
+        public JoinConstrainableContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnValueCollectionPair> constraintList)
             : base(join)
         {
             if (constraintList == null)

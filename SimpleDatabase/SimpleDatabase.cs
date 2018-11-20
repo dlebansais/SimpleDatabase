@@ -184,9 +184,9 @@ namespace Database
         /// <returns>
         ///     The request result.
         /// </returns>
-        IMultiQueryResult Run(IMultiQueryContext context);
+        IJoinQueryResult Run(IJoinQueryContext context);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        Task<IMultiQueryResult> RunAsync(IMultiQueryContext context);
+        Task<IJoinQueryResult> RunAsync(IJoinQueryContext context);
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
@@ -581,7 +581,7 @@ namespace Database
         /// <returns>
         ///     The request result.
         /// </returns>
-        public IMultiQueryResult Run(IMultiQueryContext context)
+        public IJoinQueryResult Run(IJoinQueryContext context)
         {
             Debug.Assert(Connector != null);
             Debug.Assert(Connector.IsOpen);
@@ -589,7 +589,7 @@ namespace Database
             return Execute(context);
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public Task<IMultiQueryResult> RunAsync(IMultiQueryContext context)
+        public Task<IJoinQueryResult> RunAsync(IJoinQueryContext context)
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             Debug.Assert(Connector != null);
@@ -608,13 +608,13 @@ namespace Database
         /// <returns>
         ///     The request result.
         /// </returns>
-        protected virtual IMultiQueryResult Execute(IMultiQueryContext context)
+        protected virtual IJoinQueryResult Execute(IJoinQueryContext context)
         {
             if (!IsOperationThreadStarted)
-                return new MultiQueryResult(false);
+                return new JoinQueryResult(false);
 
-            IActiveOperation<IMultiQueryResultInternal> ActiveOperation = Connector.MultiQuery(context);
-            IMultiQueryResultInternal Result = ActiveOperation.Result;
+            IActiveOperation<IJoinQueryResultInternal> ActiveOperation = Connector.JoinQuery(context);
+            IJoinQueryResultInternal Result = ActiveOperation.Result;
 
             if (Result.IsStarted)
             {

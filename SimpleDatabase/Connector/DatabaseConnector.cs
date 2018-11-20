@@ -15,7 +15,7 @@ namespace Database.Internal
         void Close();
 
         IActiveOperation<ISingleQueryResultInternal> SingleQuery(ISingleQueryContext context);
-        IActiveOperation<IMultiQueryResultInternal> MultiQuery(IMultiQueryContext context);
+        IActiveOperation<IJoinQueryResultInternal> JoinQuery(IJoinQueryContext context);
         IActiveOperation<IUpdateResultInternal> Update(IUpdateContext context);
         IActiveOperation<IInsertResultInternal> Insert(IInsertContext context);
         IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context);
@@ -37,7 +37,7 @@ namespace Database.Internal
         public abstract void Close();
 
         public abstract IActiveOperation<ISingleQueryResultInternal> SingleQuery(ISingleQueryContext context);
-        public abstract IActiveOperation<IMultiQueryResultInternal> MultiQuery(IMultiQueryContext context);
+        public abstract IActiveOperation<IJoinQueryResultInternal> JoinQuery(IJoinQueryContext context);
         public abstract IActiveOperation<IUpdateResultInternal> Update(IUpdateContext context);
         public abstract IActiveOperation<IInsertResultInternal> Insert(IInsertContext context);
         public abstract IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context);

@@ -7,7 +7,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request to query values from several tables.
     /// </summary>
-    public interface IMultiQueryContext : IMultiTableConstrainableContext, IQueryContext
+    public interface IJoinQueryContext : IJoinConstrainableContext, IQueryContext
     {
         /// <summary>
         ///     Gets the columns specifying values to query.
@@ -21,11 +21,11 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request to query values from several tables.
     /// </summary>
-    public class MultiQueryContext : MultiTableConstrainableContext, IMultiQueryContext
+    public class JoinQueryContext : JoinConstrainableContext, IJoinQueryContext
     {
         #region Init
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiQueryContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinQueryContext"/> class.
         ///     This instance has no join and addresses only one table.
         ///     Creating a request with zero columns is valid, and the corresponding operation will always return success with no rows immediately.
         /// </summary>
@@ -35,14 +35,14 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="filterList"/> is null.
         /// </exception>
-        public MultiQueryContext(IEnumerable<IColumnDescriptor> filterList)
+        public JoinQueryContext(IEnumerable<IColumnDescriptor> filterList)
             : base()
         {
             InitFilters(filterList);
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiQueryContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinQueryContext"/> class.
         ///     Creating a request with zero columns is valid, and the corresponding operation will always return success with no rows immediately.
         /// </summary>
         /// <parameters>
@@ -58,14 +58,14 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="filterList"/> is null.
         /// </exception>
-        public MultiQueryContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnDescriptor> filterList)
+        public JoinQueryContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnDescriptor> filterList)
             : base(join)
         {
             InitFilters(filterList);
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiQueryContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinQueryContext"/> class.
         ///     This instance has no join and addresses only one table.
         ///     Creating a request with zero columns is valid, and the corresponding operation will always return success with no rows immediately.
         /// </summary>
@@ -79,14 +79,14 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="filterList"/> is null.
         /// </exception>
-        public MultiQueryContext(IEnumerable<IColumnValueCollectionPair> constraintList, IEnumerable<IColumnDescriptor> filterList)
+        public JoinQueryContext(IEnumerable<IColumnValueCollectionPair> constraintList, IEnumerable<IColumnDescriptor> filterList)
             : base(constraintList)
         {
             InitFilters(filterList);
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiQueryContext"/> class.
+        ///     Initializes a new instance of the <see cref="JoinQueryContext"/> class.
         ///     Creating a request with zero columns is valid, and the corresponding operation will always return success with no rows immediately.
         /// </summary>
         /// <parameters>
@@ -106,7 +106,7 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="filterList"/> is null.
         /// </exception>
-        public MultiQueryContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnValueCollectionPair> constraintList, IEnumerable<IColumnDescriptor> filterList)
+        public JoinQueryContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnValueCollectionPair> constraintList, IEnumerable<IColumnDescriptor> filterList)
             : base(join, constraintList)
         {
             InitFilters(filterList);
