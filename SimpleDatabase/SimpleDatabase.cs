@@ -204,20 +204,6 @@ namespace Database
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
-        ///     Executes a request to insert a single row of values in a table.
-        /// </summary>
-        /// <parameters>
-        /// <param name="context">Description of the request.</param>
-        /// </parameters>
-        /// <returns>
-        ///     The request result.
-        /// </returns>
-        ISingleInsertResult Run(ISingleInsertContext context);
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        Task<ISingleInsertResult> RunAsync(ISingleInsertContext context);
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-
-        /// <summary>
         ///     Executes a request to insert several values in a table.
         /// </summary>
         /// <parameters>
@@ -685,65 +671,6 @@ namespace Database
 
             IActiveOperation<IUpdateResultInternal> ActiveOperation = Connector.Update(context);
             IUpdateResultInternal Result = ActiveOperation.Result;
-
-            if (Result.IsStarted)
-            {
-                ActiveOperationTable.Add(ActiveOperation);
-                NewOperationEvent.Set();
-                Result.WaitCompleted();
-            }
-
-            return Result;
-        }
-        #endregion
-
-        #region Single Insert
-        /// <summary>
-        ///     Executes a request to insert a single row of values in a table.
-        /// </summary>
-        /// <parameters>
-        /// <param name="context">Description of the request.</param>
-        /// </parameters>
-        /// <returns>
-        ///     The request result.
-        /// </returns>
-        public ISingleInsertResult Run(ISingleInsertContext context)
-        {
-            Debug.Assert(Connector != null);
-            Debug.Assert(Connector.IsOpen);
-
-            return Execute(context);
-        }
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public Task<ISingleInsertResult> RunAsync(ISingleInsertContext context)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            Debug.Assert(Connector != null);
-            Debug.Assert(Connector.IsOpen);
-
-            return Task.Run(() => Execute(context));
-        }
-
-        /// <summary>
-        ///     Executes a request to insert a single row of values in a table.
-        ///     This is the synchronous implementation.
-        /// </summary>
-        /// <parameters>
-        /// <param name="context">Description of the request.</param>
-        /// </parameters>
-        /// <returns>
-        ///     The request result.
-        /// </returns>
-        protected virtual ISingleInsertResult Execute(ISingleInsertContext context)
-        {
-            if (!IsOperationThreadStarted)
-                return new SingleInsertResult(false);
-
-            if (context.EntryList.Count == 0)
-                return new SingleInsertResult(true);
-
-            IActiveOperation<ISingleInsertResultInternal> ActiveOperation = Connector.SingleInsert(context);
-            ISingleInsertResultInternal Result = ActiveOperation.Result;
 
             if (Result.IsStarted)
             {

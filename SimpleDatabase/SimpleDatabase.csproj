@@ -118,7 +118,6 @@
     <Compile Include="Connector\MySql\Operation\MySqlDeleteOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlQueryOperation.cs" />
-    <Compile Include="Connector\MySql\Operation\MySqlSingleInsertOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlSingleQueryOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlUpdateOperation.cs" />
     <Compile Include="Credential.cs" />
@@ -134,7 +133,6 @@
     <Compile Include="Operation\Context\MultiTableConstrainableContext.cs" />
     <Compile Include="Operation\Context\MultiTableOperationContext.cs" />
     <Compile Include="Operation\Context\QueryContext.cs" />
-    <Compile Include="Operation\Context\SingleInsertContext.cs" />
     <Compile Include="Operation\Context\SingleQueryContext.cs" />
     <Compile Include="Operation\Context\SingleRowConstrainableContext.cs" />
     <Compile Include="Operation\Context\SingleTableOperationContext.cs" />
@@ -154,10 +152,8 @@
     <Compile Include="Operation\Result\DeleteResult.cs" />
     <Compile Include="Operation\Result\QueryResult.cs" />
     <Compile Include="Operation\Result\Result.cs" />
-    <Compile Include="Operation\Result\SingleInsertResult.cs" />
     <Compile Include="Operation\Result\SingleQueryResult.cs" />
     <Compile Include="Operation\Result\UpdateResult.cs" />
-    <Compile Include="Operation\SingleInsertOperation.cs" />
     <Compile Include="Operation\SingleQueryOperation.cs" />
     <Compile Include="Operation\UpdateOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -428,15 +428,15 @@ namespace Database.Internal
         }
         #endregion
 
-        #region Single Insert
-        public override IActiveOperation<ISingleInsertResultInternal> SingleInsert(ISingleInsertContext context)
+        #region Multi Insert
+        public override IActiveOperation<IMultiInsertResultInternal> MultiInsert(IMultiInsertContext context)
         {
             if (ServerVersionMajor < 8)
             {
                 IColumnDescriptor PrimaryKey = context.Table.PrimaryKey;
 
                 bool HasPrimary = false;
-                foreach (IColumnValuePair Entry in context.EntryList)
+                foreach (IColumnValueCollectionPair Entry in context.EntryList)
                     if (Entry.Column == PrimaryKey)
                     {
                         HasPrimary = true;
@@ -444,21 +444,9 @@ namespace Database.Internal
                     }
 
                 if (!HasPrimary && (PrimaryKey is IColumnDescriptorGuid))
-                    return new ActiveOperation<ISingleInsertResultInternal>(new SingleInsertResult(false));
+                    return new ActiveOperation<IMultiInsertResultInternal>(new MultiInsertResult(false));
             }
 
-            IMySqlSingleInsertOperation Operation = new MySqlSingleInsertOperation(context);
-            IReadOnlyCollection<IColumnValuePair<byte[]>> DataEntryList = Operation.GetDataEntryList();
-            return PrepareNonQueryOperationWithParameter<ISingleInsertContext, IMySqlSingleInsertOperation, ISingleInsertOperation, ISingleInsertResult, ISingleInsertResultInternal>(
-                Operation, DataEntryList, 
-                (ISingleInsertOperation operation, IAsyncResult asyncResult) => new SingleInsertResult(operation, asyncResult),
-                (MySqlCommand command, ISingleInsertResultInternal result) => Operation.FinalizeOperation(command, result));
-        }
-        #endregion
-
-        #region Multi Insert
-        public override IActiveOperation<IMultiInsertResultInternal> MultiInsert(IMultiInsertContext context)
-        {
             IMySqlMultiInsertOperation Operation = new MySqlMultiInsertOperation(context);
             IReadOnlyCollection<IColumnValueCollectionPair<byte[]>> DataCollectionEntryList = Operation.GetDataEntryList();
 
