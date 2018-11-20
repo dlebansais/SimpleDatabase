@@ -34,6 +34,35 @@ namespace Database
         #region Init
         /// <summary>
         ///     Initializes a new instance of the <see cref="MultiInsertContext"/> class.
+        ///     This instance will insert a single row.
+        ///     Creating a request with zero columns is valid, and the corresponding operation will always return success immediately.
+        /// </summary>
+        /// <parameters>
+        /// <param name="table">The table addressed by the request.</param>
+        /// <param name="entryList">The columns with a value to insert.</param>
+        /// </parameters>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="table"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="entryList"/> is null.
+        /// </exception>
+        public MultiInsertContext(ITableDescriptor table, IEnumerable<IColumnValuePair> entryList)
+            : base(table)
+        {
+            if (entryList == null)
+                throw new ArgumentNullException(nameof(entryList));
+
+            List<IColumnValueCollectionPair> InitEntryList = new List<IColumnValueCollectionPair>();
+            foreach (IColumnValuePair Entry in entryList)
+                InitEntryList.Add(Entry.GetAsCollection());
+
+            RowCount = 1;
+            EntryList = InitEntryList.AsReadOnly();
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MultiInsertContext"/> class.
         ///     Creating a request with zero rows or columns is valid, and the corresponding operation will always return success immediately.
         /// </summary>
         /// <parameters>
