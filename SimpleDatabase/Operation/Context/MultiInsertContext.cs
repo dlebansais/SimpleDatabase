@@ -7,7 +7,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request to insert several values in a table.
     /// </summary>
-    public interface IMultiInsertContext : IInsertContext, IDataContext
+    public interface IMultiInsertContext : ISingleTableOperationContext, IModifyContext, IDataContext
     {
         /// <summary>
         ///     Gets the number of values to insert.
@@ -29,7 +29,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request to insert several values in a table.
     /// </summary>
-    public class MultiInsertContext : InsertContext, IMultiInsertContext
+    public class MultiInsertContext : SingleTableOperationContext, IMultiInsertContext
     {
         #region Init
         /// <summary>

@@ -2,12 +2,12 @@
 
 namespace Database.Internal
 {
-    internal interface IMultiInsertOperation : IInsertOperation<IMultiInsertContext, IMultiInsertResult>, IInsertOperation
+    internal interface IMultiInsertOperation : IOperation<IMultiInsertContext, IMultiInsertResult>, IModifyOperation
     {
         IReadOnlyCollection<IColumnValueCollectionPair<byte[]>> GetDataEntryList();
     }
 
-    internal class MultiInsertOperation : InsertOperation<IMultiInsertContext, IMultiInsertResult>, IMultiInsertOperation
+    internal class MultiInsertOperation : Operation<IMultiInsertContext, IMultiInsertResult>, IMultiInsertOperation
     {
         #region Init
         public MultiInsertOperation(IMultiInsertContext context)

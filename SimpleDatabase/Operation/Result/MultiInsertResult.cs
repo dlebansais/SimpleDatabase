@@ -6,7 +6,7 @@ namespace Database
     /// <summary>
     ///     Represents the result of a request to insert several values in a table.
     /// </summary>
-    public interface IMultiInsertResult : IInsertResult, IModifyResult, IDataResult
+    public interface IMultiInsertResult : IModifyResult, IDataResult
     {
         /// <summary>
         ///     Gets the primary key column and value of the last inserted row.
@@ -20,12 +20,12 @@ namespace Database
 
 namespace Database.Internal
 {
-    internal interface IMultiInsertResultInternal : IInsertResultInternal, IModifyResultInternal, IDataResultInternal, IMultiInsertResult
+    internal interface IMultiInsertResultInternal : IMultiInsertResult, IModifyResultInternal, IDataResultInternal
     {
         void SetCompletedWithId(IColumnValuePair lastCreatedKeyId);
     }
 
-    internal class MultiInsertResult : InsertResult, IMultiInsertResultInternal
+    internal class MultiInsertResult : Result, IMultiInsertResultInternal
     {
         #region Init
         public MultiInsertResult(IMultiInsertOperation operation, IAsyncResult asyncResult)
