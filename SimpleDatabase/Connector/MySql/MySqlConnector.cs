@@ -55,20 +55,28 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 bool IsValidityError = false;
 
-                MySqlException AsMySqlException = e as MySqlException;
-                while (AsMySqlException != null && !IsValidityError)
-                    if (AsMySqlException.Number == ER_DBACCESS_DENIED_ERROR || AsMySqlException.Number == ER_ACCESS_DENIED_ERROR || AsMySqlException.Number == ER_BAD_DB_ERROR)
+                MySqlException InnerException = e;
+                while (InnerException != null && !IsValidityError)
+                    if (InnerException.Number == ER_DBACCESS_DENIED_ERROR || InnerException.Number == ER_ACCESS_DENIED_ERROR || InnerException.Number == ER_BAD_DB_ERROR)
                         IsValidityError = true;
                     else
-                        AsMySqlException = AsMySqlException.InnerException as MySqlException;
+                    {
+                        _LastErrorCode = InnerException.Number;
+                        InnerException = InnerException.InnerException as MySqlException;
+                    }
 
                 if (!IsValidityError)
                     TraceMySqlException(e);
 
+                Success = false;
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
                 Success = false;
             }
 
@@ -131,9 +139,14 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 TraceMySqlException(e);
+                return false;
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
                 return false;
             }
         }
@@ -193,9 +206,13 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 TraceMySqlException(e);
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
             }
         }
 
@@ -248,9 +265,14 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 TraceMySqlException(e);
+                return false;
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
                 return false;
             }
         }
@@ -315,9 +337,13 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 TraceMySqlException(e);
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
             }
         }
         #endregion
@@ -344,6 +370,7 @@ namespace Database.Internal
                     string UseCommandString = $"USE {credential.Schema.Name};";
                     ExecuteCommand(Connection, UseCommandString);
 
+                    _IgnoreErrorCode = 0;
                     return true;
                 }
                 else
@@ -355,9 +382,14 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 TraceMySqlException(e);
+                return false;
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
                 return false;
             }
         }
@@ -486,9 +518,15 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 TraceMySqlException(e);
+                OperationResult = createResultHandler(operation, null);
+                ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult);
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
                 OperationResult = createResultHandler(operation, null);
                 ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult);
             }
@@ -525,9 +563,15 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 TraceMySqlException(e);
+                OperationResult = createResultHandler(operation, null);
+                ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult);
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
                 OperationResult = createResultHandler(operation, null);
                 ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult);
             }
@@ -575,9 +619,15 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 TraceMySqlException(e);
+                OperationResult = createResultHandler(operation, null);
+                ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult);
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
                 OperationResult = createResultHandler(operation, null);
                 ActiveOperation = new MySqlActiveOperation<TInternal>(OperationResult);
             }
@@ -605,13 +655,19 @@ namespace Database.Internal
                     throw;
                 }
 #endif
-                catch (Exception e)
+                catch (MySqlException e)
                 {
                     TraceMySqlException(e);
+                }
+                catch (Exception e)
+                {
+                    TraceException(e);
                 }
             }
             else
                 throw new InvalidCastException("Invalid operation");
+
+            _IgnoreErrorCode = 0;
         }
 
         private static void TraceCommand(MySqlCommand command)
@@ -629,11 +685,23 @@ namespace Database.Internal
             Debugging.Print($"MySql command ({command.GetHashCode()}) {diagnostic}");
         }
 
-        private static void TraceMySqlException(Exception e, [CallerMemberName] string CallerName = "")
+        private static void TraceMySqlException(MySqlException e, [CallerMemberName] string CallerName = "")
+        {
+            if (e.Number == _IgnoreErrorCode)
+                return;
+
+            _LastErrorCode = e.Number;
+
+            string CallerNameInfo = (CallerName.Length > 0 ? $" (from {CallerName})" : "");
+            string ServerVersionInfo = (ServerVersion != null ? $", Server Version: {ServerVersion}" : "");
+            Debugging.PrintExceptionMessage($"MySql exception{CallerNameInfo}{ServerVersionInfo}: {e.Message}, number={e.Number}");
+        }
+
+        private static void TraceException(Exception e, [CallerMemberName] string CallerName = "")
         {
             string CallerNameInfo = (CallerName.Length > 0 ? $" (from {CallerName})" : "");
             string ServerVersionInfo = (ServerVersion != null ? $", Server Version: {ServerVersion}" : "");
-            Debugging.PrintExceptionMessage($"MySql exception{CallerNameInfo}{ServerVersionInfo}: {e.Message}");
+            Debugging.PrintExceptionMessage($"Exception{CallerNameInfo}{ServerVersionInfo}: {e.Message}");
         }
 
         private void StartWatch(out Stopwatch watch)
@@ -648,6 +716,11 @@ namespace Database.Internal
             if (Remaining > TimeSpan.Zero)
                 Thread.Sleep(Remaining);
         }
+
+        public override int IgnoreErrorCode { get { return _IgnoreErrorCode; } set { _IgnoreErrorCode = value; } }
+        private static int _IgnoreErrorCode { get; set; }
+        public override int LastErrorCode { get { return _LastErrorCode; } }
+        private static int _LastErrorCode;
 
         private Dictionary<IMySqlActiveOperation, MySqlCommand> ActiveOperationTable;
         private static string ServerVersion;
@@ -669,10 +742,16 @@ namespace Database.Internal
                 throw;
             }
 #endif
-            catch (Exception e)
+            catch (MySqlException e)
             {
                 TraceMySqlException(e);
             }
+            catch (Exception e)
+            {
+                TraceException(e);
+            }
+
+            _IgnoreErrorCode = 0;
         }
         #endregion
 
@@ -763,14 +842,16 @@ namespace Database.Internal
                 throw;
             }
 #endif
+            catch (MySqlException e)
+            {
+                TraceMySqlException(e);
+                errorCode = e.Number;
+                return false;
+            }
             catch (Exception e)
             {
-                if (e is MySqlException AsSqlException)
-                    errorCode = AsSqlException.Number;
-                else
-                    errorCode = -1;
-
-                TraceMySqlException(e);
+                TraceException(e);
+                errorCode = -1;
                 return false;
             }
         }
@@ -803,14 +884,17 @@ namespace Database.Internal
                 throw;
             }
 #endif
+            catch (MySqlException e)
+            {
+                TraceMySqlException(e);
+                errorCode = e.Number;
+                rowCount = -1;
+                return false;
+            }
             catch (Exception e)
             {
-                if (e is MySqlException AsSqlException)
-                    errorCode = AsSqlException.Number;
-                else
-                    errorCode = -1;
-
-                TraceMySqlException(e);
+                TraceException(e);
+                errorCode = -1;
                 rowCount = -1;
                 return false;
             }

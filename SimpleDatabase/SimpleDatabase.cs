@@ -39,6 +39,14 @@ namespace Database
         ConnectionOption ConnectionOption { get; }
 
         /// <summary>
+        ///     Gets the last error code returned by the database engine.
+        /// </summary>
+        /// <returns>
+        ///     The last error code returned by the database engine.
+        /// </returns>
+        int LastErrorCode { get; }
+
+        /// <summary>
         ///     Performs checks on a <see cref="ICredential"/> object to verify if it can be used with the <see cref="Open"/> method successfully.
         /// </summary>
         /// <parameters>
@@ -293,7 +301,7 @@ namespace Database
                         break;
 
                     default:
-                        throw new ArgumentOutOfRangeException("Invalid ConnectorType");
+                        throw new ArgumentOutOfRangeException(nameof(connectorType));
                 }
 
                 Debugging.Print("Connector created: " + Connector.ToString());
@@ -321,7 +329,7 @@ namespace Database
         /// <returns>
         ///     The engine backing the database.
         /// </returns>
-        public virtual ConnectorType ConnectorType { get; private set; }
+        public ConnectorType ConnectorType { get; private set; }
 
         /// <summary>
         ///     Gets the options related to connection to a server
@@ -329,7 +337,18 @@ namespace Database
         /// <returns>
         ///     The options related to connection to a server
         /// </returns>
-        public virtual ConnectionOption ConnectionOption { get; private set; }
+        public ConnectionOption ConnectionOption { get; private set; }
+
+        /// <summary>
+        ///     Gets the last error code returned by the database engine.
+        /// </summary>
+        /// <returns>
+        ///     The last error code returned by the database engine.
+        /// </returns>
+        public int LastErrorCode { get { return Connector != null ? Connector.LastErrorCode : 0; } }
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public int IgnoreErrorCode { get { return Connector != null ? ((DatabaseConnector)Connector).IgnoreErrorCode : 0; } set { if (Connector != null) ((DatabaseConnector)Connector).IgnoreErrorCode = value; } }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         #endregion
 
         #region Credentials

@@ -22,6 +22,8 @@ namespace Database.Internal
         IActiveOperation<ISingleRowDeleteResultInternal> SingleRowDelete(ISingleRowDeleteContext context);
         IActiveOperation<IMultiRowDeleteResultInternal> MultiRowDelete(IMultiRowDeleteContext context);
         void NotifyOperationCompleted(IActiveOperation activeOperation);
+
+        int LastErrorCode { get; }
     }
 
     internal abstract class DatabaseConnector : IDatabaseConnector
@@ -44,5 +46,8 @@ namespace Database.Internal
         public abstract IActiveOperation<ISingleRowDeleteResultInternal> SingleRowDelete(ISingleRowDeleteContext context);
         public abstract IActiveOperation<IMultiRowDeleteResultInternal> MultiRowDelete(IMultiRowDeleteContext context);
         public abstract void NotifyOperationCompleted(IActiveOperation activeOperation);
+
+        public abstract int LastErrorCode { get; }
+        public abstract int IgnoreErrorCode { get; set; }
     }
 }
