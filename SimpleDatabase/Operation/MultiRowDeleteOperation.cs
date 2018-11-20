@@ -1,13 +1,13 @@
 ﻿namespace Database.Internal
 {
-    internal interface IMultiRowDeleteOperation : IOperation<IMultiRowDeleteContext, IMultiRowDeleteResult>, IModifyOperation
+    internal interface IDeleteOperation : IOperation<IDeleteContext, IDeleteResult>, IModifyOperation
     {
     }
 
-    internal class MultiRowDeleteOperation : Operation<IMultiRowDeleteContext, IMultiRowDeleteResult>, IMultiRowDeleteOperation
+    internal class DeleteOperation : Operation<IDeleteContext, IDeleteResult>, IDeleteOperation
     {
         #region Init
-        public MultiRowDeleteOperation(IMultiRowDeleteContext context)
+        public DeleteOperation(IDeleteContext context)
             : base(context)
         {
         }

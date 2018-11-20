@@ -6,7 +6,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request to delete rows in a table, with constraints.
     /// </summary>
-    public interface IMultiRowDeleteContext : IMultiRowConstrainableContext, IModifyContext
+    public interface IDeleteContext : IMultiRowConstrainableContext, IModifyContext
     {
         /// <summary>
         ///     Gets the expected minimum number of rows to be deleted.
@@ -20,11 +20,11 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request to delete rows in a table, with constraints.
     /// </summary>
-    public class MultiRowDeleteContext : MultiRowConstrainableContext, IMultiRowDeleteContext
+    public class DeleteContext : MultiRowConstrainableContext, IDeleteContext
     {
         #region Init
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiRowDeleteContext"/> class.
+        ///     Initializes a new instance of the <see cref="DeleteContext"/> class.
         ///     This request has no constraints.
         ///     This request will be considered successful only if it deletes at least <paramref name="expectedDeletedCount"/> rows.
         /// </summary>
@@ -38,7 +38,7 @@ namespace Database
         /// <exception cref="ArgumentOutOfRangeException">
         ///     <paramref name="expectedDeletedCount"/> is negative.
         /// </exception>
-        public MultiRowDeleteContext(ITableDescriptor table, int expectedDeletedCount)
+        public DeleteContext(ITableDescriptor table, int expectedDeletedCount)
             : base(table)
         {
             if (expectedDeletedCount < 0)
@@ -47,7 +47,7 @@ namespace Database
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiRowDeleteContext"/> class.
+        ///     Initializes a new instance of the <see cref="DeleteContext"/> class.
         ///     This request has a constraint: one column must match one value.
         ///     This request will be considered successful only if it deletes at least <paramref name="expectedDeletedCount"/> rows.
         /// </summary>
@@ -65,7 +65,7 @@ namespace Database
         /// <exception cref="ArgumentOutOfRangeException">
         ///     <paramref name="expectedDeletedCount"/> is negative.
         /// </exception>
-        public MultiRowDeleteContext(ITableDescriptor table, IColumnValuePair constraint, int expectedDeletedCount)
+        public DeleteContext(ITableDescriptor table, IColumnValuePair constraint, int expectedDeletedCount)
             : base(table, constraint)
         {
             if (expectedDeletedCount < 0)
@@ -74,7 +74,7 @@ namespace Database
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiRowDeleteContext"/> class.
+        ///     Initializes a new instance of the <see cref="DeleteContext"/> class.
         ///     This request has a constraint: one column must match one value among many.
         ///     This request will be considered successful only if it deletes at least <paramref name="expectedDeletedCount"/> rows.
         /// </summary>
@@ -92,7 +92,7 @@ namespace Database
         /// <exception cref="ArgumentOutOfRangeException">
         ///     <paramref name="expectedDeletedCount"/> is negative.
         /// </exception>
-        public MultiRowDeleteContext(ITableDescriptor table, IColumnValueCollectionPair constraint, int expectedDeletedCount)
+        public DeleteContext(ITableDescriptor table, IColumnValueCollectionPair constraint, int expectedDeletedCount)
             : base(table, constraint)
         {
             if (expectedDeletedCount < 0)
@@ -101,7 +101,7 @@ namespace Database
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MultiRowDeleteContext"/> class.
+        ///     Initializes a new instance of the <see cref="DeleteContext"/> class.
         ///     This request has a constraint: several columns must match a single value.
         ///     This request will be considered successful only if it deletes at least <paramref name="expectedDeletedCount"/> rows.
         /// </summary>
@@ -119,7 +119,7 @@ namespace Database
         /// <exception cref="ArgumentOutOfRangeException">
         ///     <paramref name="expectedDeletedCount"/> is negative.
         /// </exception>
-        public MultiRowDeleteContext(ITableDescriptor table, IEnumerable<IColumnValuePair> constraintList, int expectedDeletedCount)
+        public DeleteContext(ITableDescriptor table, IEnumerable<IColumnValuePair> constraintList, int expectedDeletedCount)
             : base(table, constraintList)
         {
             if (expectedDeletedCount < 0)

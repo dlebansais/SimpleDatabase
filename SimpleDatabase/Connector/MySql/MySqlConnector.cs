@@ -468,12 +468,12 @@ namespace Database.Internal
         #endregion
 
         #region Multi Row Delete
-        public override IActiveOperation<IMultiRowDeleteResultInternal> MultiRowDelete(IMultiRowDeleteContext context)
+        public override IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context)
         {
-            IMySqlMultiRowDeleteOperation Operation = new MySqlMultiRowDeleteOperation(context);
-            return PrepareNonQueryOperation<IMultiRowDeleteContext, IMySqlMultiRowDeleteOperation, IMultiRowDeleteOperation, IMultiRowDeleteResult, IMultiRowDeleteResultInternal>(
-                Operation, (IMultiRowDeleteOperation operation, IAsyncResult asyncResult) => new MultiRowDeleteResult(operation, asyncResult),
-                (MySqlCommand command, IMultiRowDeleteResultInternal result) => Operation.FinalizeOperation(command, result));
+            IMySqlDeleteOperation Operation = new MySqlDeleteOperation(context);
+            return PrepareNonQueryOperation<IDeleteContext, IMySqlDeleteOperation, IDeleteOperation, IDeleteResult, IDeleteResultInternal>(
+                Operation, (IDeleteOperation operation, IAsyncResult asyncResult) => new DeleteResult(operation, asyncResult),
+                (MySqlCommand command, IDeleteResultInternal result) => Operation.FinalizeOperation(command, result));
         }
         #endregion
 

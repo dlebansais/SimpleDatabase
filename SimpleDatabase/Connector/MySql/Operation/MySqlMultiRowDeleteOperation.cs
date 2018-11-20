@@ -5,14 +5,14 @@ using System.Diagnostics;
 
 namespace Database.Internal
 {
-    internal interface IMySqlMultiRowDeleteOperation : IMultiRowDeleteOperation, IMySqlModifyOperation<IMultiRowDeleteContext, IMultiRowDeleteResultInternal>
+    internal interface IMySqlDeleteOperation : IDeleteOperation, IMySqlModifyOperation<IDeleteContext, IDeleteResultInternal>
     {
     }
 
-    internal class MySqlMultiRowDeleteOperation : MultiRowDeleteOperation, IMySqlMultiRowDeleteOperation
+    internal class MySqlDeleteOperation : DeleteOperation, IMySqlDeleteOperation
     {
         #region Init
-        public MySqlMultiRowDeleteOperation(IMultiRowDeleteContext context)
+        public MySqlDeleteOperation(IDeleteContext context)
             : base(context)
         {
         }
@@ -33,7 +33,7 @@ namespace Database.Internal
             return Result;
         }
 
-        public virtual string FinalizeOperation(MySqlCommand Command, IMultiRowDeleteResultInternal Result)
+        public virtual string FinalizeOperation(MySqlCommand Command, IDeleteResultInternal Result)
         {
             try
             {

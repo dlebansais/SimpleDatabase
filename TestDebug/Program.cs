@@ -34,9 +34,9 @@ namespace TestDebug
             Success = Database.CreateTables(Credential);
             Success = Database.Open(Credential);
 
-            IMultiRowDeleteResult DeleteResult;
-            DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test0, 0));
-            DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test1, 0));
+            IDeleteResult DeleteResult;
+            DeleteResult = Database.Run(new DeleteContext(TestSchema.Test0, 0));
+            DeleteResult = Database.Run(new DeleteContext(TestSchema.Test1, 0));
 
             ISingleInsertResult InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<ColumnValuePair<Guid>>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty) }));
 
@@ -45,10 +45,10 @@ namespace TestDebug
             Database.DeleteCredential(RootId, RootPassword, Credential);
 
             Database.Open(Credential);
-            IMultiRowDeleteResult SingleDeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty), 0));
+            IDeleteResult SingleDeleteResult = Database.Run(new DeleteContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, Guid.Empty), 0));
 
-            DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test0, 0));
-            DeleteResult = Database.Run(new MultiRowDeleteContext(TestSchema.Test1, 0));
+            DeleteResult = Database.Run(new DeleteContext(TestSchema.Test0, 0));
+            DeleteResult = Database.Run(new DeleteContext(TestSchema.Test1, 0));
 
             Database.Close();
             Database.DeleteTables(Credential);

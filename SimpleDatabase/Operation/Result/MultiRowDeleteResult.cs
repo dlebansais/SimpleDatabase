@@ -5,25 +5,25 @@ namespace Database
     /// <summary>
     ///     Represents the result of a request to delete rows in a table, with constraints.
     /// </summary>
-    public interface IMultiRowDeleteResult : IModifyResult
+    public interface IDeleteResult : IModifyResult
     {
     }
 }
 
 namespace Database.Internal
 {
-    internal interface IMultiRowDeleteResultInternal : IModifyResultInternal, IMultiRowDeleteResult
+    internal interface IDeleteResultInternal : IModifyResultInternal, IDeleteResult
     {
     }
 
-    internal class MultiRowDeleteResult : Result, IMultiRowDeleteResultInternal
+    internal class DeleteResult : Result, IDeleteResultInternal
     {
-        public MultiRowDeleteResult(IMultiRowDeleteOperation operation, IAsyncResult asyncResult)
+        public DeleteResult(IDeleteOperation operation, IAsyncResult asyncResult)
             : base(operation, asyncResult)
         {
         }
 
-        public MultiRowDeleteResult(bool success)
+        public DeleteResult(bool success)
             : base(success)
         {
         }

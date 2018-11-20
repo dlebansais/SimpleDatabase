@@ -19,7 +19,7 @@ namespace Database.Internal
         IActiveOperation<IUpdateResultInternal> Update(IUpdateContext context);
         IActiveOperation<ISingleInsertResultInternal> SingleInsert(ISingleInsertContext context);
         IActiveOperation<IMultiInsertResultInternal> MultiInsert(IMultiInsertContext context);
-        IActiveOperation<IMultiRowDeleteResultInternal> MultiRowDelete(IMultiRowDeleteContext context);
+        IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context);
         void NotifyOperationCompleted(IActiveOperation activeOperation);
 
         int LastErrorCode { get; }
@@ -42,7 +42,7 @@ namespace Database.Internal
         public abstract IActiveOperation<IUpdateResultInternal> Update(IUpdateContext context);
         public abstract IActiveOperation<ISingleInsertResultInternal> SingleInsert(ISingleInsertContext context);
         public abstract IActiveOperation<IMultiInsertResultInternal> MultiInsert(IMultiInsertContext context);
-        public abstract IActiveOperation<IMultiRowDeleteResultInternal> MultiRowDelete(IMultiRowDeleteContext context);
+        public abstract IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context);
         public abstract void NotifyOperationCompleted(IActiveOperation activeOperation);
 
         public abstract int LastErrorCode { get; }

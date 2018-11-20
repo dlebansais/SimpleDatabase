@@ -240,9 +240,9 @@ namespace Database
         /// <returns>
         ///     The request result.
         /// </returns>
-        IMultiRowDeleteResult Run(IMultiRowDeleteContext context);
+        IDeleteResult Run(IDeleteContext context);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        Task<IMultiRowDeleteResult> RunAsync(IMultiRowDeleteContext context);
+        Task<IDeleteResult> RunAsync(IDeleteContext context);
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
     #endregion
@@ -825,7 +825,7 @@ namespace Database
         /// <returns>
         ///     The request result.
         /// </returns>
-        public IMultiRowDeleteResult Run(IMultiRowDeleteContext context)
+        public IDeleteResult Run(IDeleteContext context)
         {
             Debug.Assert(Connector != null);
             Debug.Assert(Connector.IsOpen);
@@ -833,7 +833,7 @@ namespace Database
             return Execute(context);
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public Task<IMultiRowDeleteResult> RunAsync(IMultiRowDeleteContext context)
+        public Task<IDeleteResult> RunAsync(IDeleteContext context)
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             Debug.Assert(Connector != null);
@@ -852,13 +852,13 @@ namespace Database
         /// <returns>
         ///     The request result.
         /// </returns>
-        protected virtual IMultiRowDeleteResult Execute(IMultiRowDeleteContext context)
+        protected virtual IDeleteResult Execute(IDeleteContext context)
         {
             if (!IsOperationThreadStarted)
-                return new MultiRowDeleteResult(false);
+                return new DeleteResult(false);
 
-            IActiveOperation<IMultiRowDeleteResultInternal> ActiveOperation = Connector.MultiRowDelete(context);
-            IMultiRowDeleteResultInternal Result = ActiveOperation.Result;
+            IActiveOperation<IDeleteResultInternal> ActiveOperation = Connector.Delete(context);
+            IDeleteResultInternal Result = ActiveOperation.Result;
 
             if (Result.IsStarted)
             {
