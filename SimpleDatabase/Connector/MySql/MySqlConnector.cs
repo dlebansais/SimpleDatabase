@@ -370,7 +370,6 @@ namespace Database.Internal
                     string UseCommandString = $"USE {credential.Schema.Name};";
                     ExecuteCommand(Connection, UseCommandString);
 
-                    _IgnoreErrorCode = 0;
                     return true;
                 }
                 else
@@ -666,8 +665,6 @@ namespace Database.Internal
             }
             else
                 throw new InvalidCastException("Invalid operation");
-
-            _IgnoreErrorCode = 0;
         }
 
         private static void TraceCommand(MySqlCommand command)
@@ -687,21 +684,28 @@ namespace Database.Internal
 
         private static void TraceMySqlException(MySqlException e, [CallerMemberName] string CallerName = "")
         {
-            if (e.Number == _IgnoreErrorCode)
-                return;
-
             _LastErrorCode = e.Number;
 
             string CallerNameInfo = (CallerName.Length > 0 ? $" (from {CallerName})" : "");
             string ServerVersionInfo = (ServerVersion != null ? $", Server Version: {ServerVersion}" : "");
-            Debugging.PrintExceptionMessage($"MySql exception{CallerNameInfo}{ServerVersionInfo}: {e.Message}, number={e.Number}");
+            string Message = $"MySql exception{CallerNameInfo}{ServerVersionInfo}: {e.Message}, number={e.Number}";
+
+            if (e.Number == _IgnoreErrorCode)
+            {
+                _IgnoreErrorCode = 0;
+                Debugging.Print(Message);
+            }
+            else
+                Debugging.PrintExceptionMessage(Message);
         }
 
         private static void TraceException(Exception e, [CallerMemberName] string CallerName = "")
         {
             string CallerNameInfo = (CallerName.Length > 0 ? $" (from {CallerName})" : "");
             string ServerVersionInfo = (ServerVersion != null ? $", Server Version: {ServerVersion}" : "");
-            Debugging.PrintExceptionMessage($"Exception{CallerNameInfo}{ServerVersionInfo}: {e.Message}");
+            string Message = $"Exception{CallerNameInfo}{ServerVersionInfo}: {e.Message}";
+
+            Debugging.PrintExceptionMessage(Message);
         }
 
         private void StartWatch(out Stopwatch watch)
@@ -750,8 +754,6 @@ namespace Database.Internal
             {
                 TraceException(e);
             }
-
-            _IgnoreErrorCode = 0;
         }
         #endregion
 
