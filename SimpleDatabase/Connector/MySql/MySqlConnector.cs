@@ -460,8 +460,15 @@ namespace Database.Internal
         public override IActiveOperation<IMultiInsertResultInternal> MultiInsert(IMultiInsertContext context)
         {
             IMySqlMultiInsertOperation Operation = new MySqlMultiInsertOperation(context);
-            return PrepareNonQueryOperation<IMultiInsertContext, IMySqlMultiInsertOperation, IMultiInsertOperation, IMultiInsertResult, IMultiInsertResultInternal>(
-                Operation, 
+            IReadOnlyCollection<IColumnValueCollectionPair<byte[]>> DataCollectionEntryList = Operation.GetDataEntryList();
+
+            List<IColumnValuePair<byte[]>> DataEntryList = new List<IColumnValuePair<byte[]>>();
+            foreach (IColumnValueCollectionPair<byte[]> Entry in DataCollectionEntryList)
+                foreach (byte[] Value in Entry.ValueCollection)
+                    DataEntryList.Add(new ColumnValuePair<byte[]>(Entry.Column, Value));
+
+            return PrepareNonQueryOperationWithParameter<IMultiInsertContext, IMySqlMultiInsertOperation, IMultiInsertOperation, IMultiInsertResult, IMultiInsertResultInternal>(
+                Operation, DataEntryList,
                 (IMultiInsertOperation operation, IAsyncResult asyncResult) => new MultiInsertResult(operation, asyncResult),
                 (MySqlCommand command, IMultiInsertResultInternal result) => Operation.FinalizeOperation(command, result));
         }

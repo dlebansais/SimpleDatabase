@@ -25,39 +25,50 @@ namespace Database.Internal
         {
             string TableName = GetTableName();
 
-            string Result = "INSERT INTO " + TableName;
+            string Result = $"INSERT INTO {TableName}";
 
             string ColumnString;
-            IEnumerable<string> ValueStringList;
-            if (GetInitialValueString(out ColumnString, out ValueStringList))
+            ICollection<string> ValueStringList;
+            GetInitialValueString(out ColumnString, out ValueStringList);
+            Debug.Assert(!string.IsNullOrEmpty(ColumnString));
+            Debug.Assert(ValueStringList.Count > 0);
+
+            string Values = "";
+            foreach (string ValueString in ValueStringList)
             {
-                string Values = "";
-                foreach (string ValueString in ValueStringList)
-                {
-                    if (Values.Length > 0)
-                        Values += ", ";
+                if (Values.Length > 0)
+                    Values += ", ";
 
-                    Values += "( " + ValueString + " )";
-                }
-
-                Result += " ( " + ColumnString + " ) VALUES " + Values;
+                Values += $"( {ValueString} )";
             }
 
-            return Result + ";";
+            Result += $" ( {ColumnString} ) VALUES {Values};";
+
+            return Result;
         }
 
         public virtual string FinalizeOperation(MySqlCommand Command, IMultiInsertResultInternal Result)
         {
+            IColumnValuePair LastCreatedKeyId = null;
+            string Diagnostic;
+
             try
             {
                 int InsertedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
-                bool Success = (InsertedLines > 0);
-                Result.SetCompleted(Success);
 
-                if (Success)
-                    return $"succeeded, {InsertedLines} row(s) inserted";
+                if (InsertedLines > 0)
+                {
+                    LastCreatedKeyId = GetLastCreatedKeyId(Command, Result);
+                    Result.SetCompletedWithId(LastCreatedKeyId);
+                    Diagnostic = $"succeeded, {InsertedLines} rows inserted";
+                }
                 else
-                    return "failed";
+                {
+                    Result.SetCompleted(false);
+                    Diagnostic = "failed";
+                }
+
+                return Diagnostic;
             }
             catch
             {
@@ -75,10 +86,11 @@ namespace Database.Internal
             return Table.Name;
         }
 
-        protected virtual bool GetInitialValueString(out string ColumnString, out IEnumerable<string> ValueStringList)
+        protected virtual void GetInitialValueString(out string ColumnString, out ICollection<string> ValueStringList)
         {
             ITableDescriptor Table = Context.Table;
             IReadOnlyCollection<IColumnValueCollectionPair> EntryList = Context.EntryList;
+            IReadOnlyCollection<IColumnValueCollectionPair<byte[]>> DataEntryList = GetDataEntryList();
             int RowCount = Context.RowCount;
 
             Debug.Assert(EntryList.Count > 0);
@@ -89,9 +101,42 @@ namespace Database.Internal
             for (int i = 0; i < RowCount; i++)
                 StringList[i] = "";
 
+            int DataCount = 0;
+            foreach (IColumnValueCollectionPair<byte[]> DataEntry in DataEntryList)
+            {
+                IColumnDescriptor Column = DataEntry.Column;
+                IColumnType ColumnType = Column.Type;
+                IEnumerable ValueCollection = DataEntry.ValueCollection;
+                string ColumnName = Column.Name;
+
+                if (ColumnString.Length > 0)
+                    ColumnString += ", ";
+                ColumnString += ColumnName;
+
+                int i = 0;
+                foreach (object Value in ValueCollection)
+                    if (i < RowCount)
+                    {
+                        string ValueString = StringList[i];
+                        if (ValueString.Length > 0)
+                            ValueString += ", ";
+
+                        ValueString += $"?data{DataCount}";
+                        StringList[i] = ValueString;
+
+                        DataCount++;
+                        i++;
+                    }
+
+                Debug.Assert(i == RowCount);
+            }
+
             foreach (IColumnValueCollectionPair Entry in EntryList)
             {
                 IColumnDescriptor Column = Entry.Column;
+                if (Column is IColumnDescriptorByteArray)
+                    continue;
+
                 IColumnType ColumnType = Column.Type;
                 IEnumerable ValueCollection = Entry.ValueCollection;
                 string ColumnName = Column.Name;
@@ -115,22 +160,26 @@ namespace Database.Internal
                     }
 
                 Debug.Assert(i == RowCount);
-
-                //TODO remove
-                /*
-                for (; i < RowCount; i++)
-                {
-                    string ValueString = StringList[i];
-                    if (ValueString.Length > 0)
-                        ValueString += ", ";
-
-                    ValueString += ColumnType.DefaultValue;
-                    StringList[i] = ValueString;
-                }*/
             }
 
             ValueStringList = StringList;
-            return true;
+        }
+
+        protected virtual IColumnValuePair GetLastCreatedKeyId(MySqlCommand command, IMultiInsertResultInternal result)
+        {
+            ITableDescriptor Table = Context.Table;
+            IReadOnlyCollection<IColumnValueCollectionPair> ColumnInitialValues = Context.EntryList;
+            IColumnDescriptor PrimaryKeyColumn = Table.PrimaryKey;
+
+            if (PrimaryKeyColumn is IColumnDescriptorInt AsIntColumn)
+                return new ColumnValuePair<int>(AsIntColumn, (int)command.LastInsertedId);
+
+            foreach (IColumnValueCollectionPair Entry in ColumnInitialValues)
+                if (Entry.Column == PrimaryKeyColumn)
+                    return Entry.LastEntry;
+
+            Debug.Assert(false);
+            return null;
         }
         #endregion
     }

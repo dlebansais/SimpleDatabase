@@ -83,7 +83,7 @@ namespace Database.Internal
             ColumnString = "";
             ValueString = "";
 
-            int i = 0;
+            int DataCount = 0;
             foreach (IColumnValuePair<byte[]> DataEntry in DataEntryList)
             {
                 if (ColumnString.Length > 0)
@@ -91,13 +91,13 @@ namespace Database.Internal
                 if (ValueString.Length > 0)
                     ValueString += ", ";
 
-                string DataName = $"data{i}";
+                string DataName = $"data{DataCount}";
                 string ColumnName = DataEntry.Column.Name;
 
                 ColumnString += ColumnName;
                 ValueString += "?" + DataName;
 
-                i++;
+                DataCount++;
             }
 
             foreach (IColumnValuePair Entry in EntryList)

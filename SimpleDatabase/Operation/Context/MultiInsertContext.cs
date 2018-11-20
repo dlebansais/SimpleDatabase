@@ -7,7 +7,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request to insert several values in a table.
     /// </summary>
-    public interface IMultiInsertContext : IInsertContext
+    public interface IMultiInsertContext : IInsertContext, IDataContext
     {
         /// <summary>
         ///     Gets the number of values to insert.

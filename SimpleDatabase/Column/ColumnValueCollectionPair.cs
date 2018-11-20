@@ -26,6 +26,14 @@ namespace Database
         ///     A collection of <see cref="object"/>.
         /// </returns>
         IEnumerable ValueCollection { get; }
+
+        /// <summary>
+        ///     Gets the column and the last value in <see cref="ValueCollection"/>.
+        /// </summary>
+        /// <returns>
+        ///     The column and the last value in <see cref="ValueCollection"/>.
+        /// </returns>
+        IColumnValuePair LastEntry { get; }
     }
 
     /// <summary>
@@ -48,6 +56,14 @@ namespace Database
         ///     A collection of objects of type <typeparamref name="T"/>.
         /// </returns>
         IEnumerable<T> ValueCollection { get; }
+
+        /// <summary>
+        ///     Gets the column and the last value in <see cref="ValueCollection"/>.
+        /// </summary>
+        /// <returns>
+        ///     The column and the last value in <see cref="ValueCollection"/>.
+        /// </returns>
+        IColumnValuePair<T> LastEntry { get; }
     }
     #endregion
 
@@ -95,6 +111,25 @@ namespace Database
         /// </returns>
         public IEnumerable<T> ValueCollection { get; }
         IEnumerable IColumnValueCollectionPair.ValueCollection { get { return ValueCollection; } }
+
+        /// <summary>
+        ///     Gets the column and the last value in <see cref="ValueCollection"/>.
+        /// </summary>
+        /// <returns>
+        ///     The column and the last value in <see cref="ValueCollection"/>.
+        /// </returns>
+        public IColumnValuePair<T> LastEntry
+        {
+            get
+            {
+                T Result = default(T);
+                foreach (T Item in ValueCollection)
+                    Result = Item;
+
+                return new ColumnValuePair<T>(Column, Result);
+            }
+        }
+        IColumnValuePair IColumnValueCollectionPair.LastEntry { get { return (IColumnValuePair)LastEntry; } }
         #endregion
 
         #region Debugging
