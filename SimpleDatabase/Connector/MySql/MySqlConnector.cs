@@ -710,6 +710,7 @@ namespace Database.Internal
         private static int _IgnoreErrorCode { get; set; }
         public override int LastErrorCode { get { return _LastErrorCode; } }
         private static int _LastErrorCode;
+        public override bool CanIntBeNULL { get { return ServerVersionMajor >= 8; } }
 
         private Dictionary<IMySqlActiveOperation, MySqlCommand> ActiveOperationTable;
         private static string ServerVersion;

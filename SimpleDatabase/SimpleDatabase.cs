@@ -320,6 +320,7 @@ namespace Database
         public int LastErrorCode { get { return Connector != null ? Connector.LastErrorCode : 0; } }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public int IgnoreErrorCode { get { return Connector != null ? ((DatabaseConnector)Connector).IgnoreErrorCode : 0; } set { if (Connector != null) ((DatabaseConnector)Connector).IgnoreErrorCode = value; } }
+        public bool CanIntBeNULL { get { return Connector != null ? ((DatabaseConnector)Connector).CanIntBeNULL : false; } }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         #endregion
 

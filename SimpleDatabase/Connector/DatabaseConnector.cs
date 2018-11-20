@@ -45,5 +45,6 @@ namespace Database.Internal
 
         public abstract int LastErrorCode { get; }
         public abstract int IgnoreErrorCode { get; set; }
+        public abstract bool CanIntBeNULL { get; }
     }
 }
