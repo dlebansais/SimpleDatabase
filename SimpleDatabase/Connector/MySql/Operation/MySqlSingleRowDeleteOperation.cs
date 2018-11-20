@@ -24,9 +24,8 @@ namespace Database.Internal
             string TableName = GetTableName();
             string ConstraintString = GetConstraintString();
 
-            string Result = "DELETE FROM " + TableName + " WHERE " + ConstraintString;
-
-            return Result + ";";
+            string Result = $"DELETE FROM {TableName} WHERE {ConstraintString};";
+            return Result;
         }
 
         public virtual string FinalizeOperation(MySqlCommand Command, ISingleRowDeleteResultInternal Result)

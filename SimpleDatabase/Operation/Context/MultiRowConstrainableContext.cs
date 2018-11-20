@@ -50,6 +50,30 @@ namespace Database
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="MultiRowConstrainableContext"/> class.
+        ///     This request has a constraint: one column must match one value.
+        /// </summary>
+        /// <parameters>
+        /// <param name="table">The table addressed by the request.</param>
+        /// <param name="constraint">The column and value it must take.</param>
+        /// </parameters>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="table"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="constraint"/> is null.
+        /// </exception>
+        public MultiRowConstrainableContext(ITableDescriptor table, IColumnValuePair constraint)
+            : base(table)
+        {
+            if (constraint == null)
+                throw new ArgumentNullException(nameof(constraint));
+
+            SingleConstraintEntry = constraint.GetAsCollection();
+            MultipleConstraintList = null;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MultiRowConstrainableContext"/> class.
         ///     This request has a constraint: one column must match one value among many.
         /// </summary>
         /// <parameters>

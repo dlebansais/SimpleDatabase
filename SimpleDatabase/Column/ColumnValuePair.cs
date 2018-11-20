@@ -1,5 +1,6 @@
 ﻿using Database.Types;
 using System;
+using System.Collections.Generic;
 
 namespace Database
 {
@@ -24,6 +25,14 @@ namespace Database
         ///     An <see cref="object"/>.
         /// </returns>
         object Value { get; }
+
+        /// <summary>
+        ///     Gets the column and its value in a collection with one element.
+        /// </summary>
+        /// <returns>
+        ///     The column and its value in a collection.
+        /// </returns>
+        IColumnValueCollectionPair GetAsCollection();
     }
 
     /// <summary>
@@ -46,6 +55,14 @@ namespace Database
         ///     An object of type <typeparamref name="T"/>.
         /// </returns>
         T Value { get; }
+
+        /// <summary>
+        ///     Gets the column and its value in a collection with one element.
+        /// </summary>
+        /// <returns>
+        ///     The column and its value in a collection.
+        /// </returns>
+        IColumnValueCollectionPair<T> GetAsCollection();
     }
     #endregion
 
@@ -90,6 +107,20 @@ namespace Database
         /// </returns>
         public T Value { get; }
         object IColumnValuePair.Value { get { return Value; } }
+        #endregion
+
+        #region Client Interface
+        /// <summary>
+        ///     Gets the column and its value in a collection with one element.
+        /// </summary>
+        /// <returns>
+        ///     The column and its value in a collection.
+        /// </returns>
+        public IColumnValueCollectionPair<T> GetAsCollection()
+        {
+            return new ColumnValueCollectionPair<T>(Column, new List<T>() { Value });
+        }
+        IColumnValueCollectionPair IColumnValuePair.GetAsCollection() { return (IColumnValueCollectionPair)GetAsCollection(); }
         #endregion
 
         #region Debugging
