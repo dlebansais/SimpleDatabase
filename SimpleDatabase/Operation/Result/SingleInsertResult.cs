@@ -22,7 +22,7 @@ namespace Database.Internal
 {
     internal interface ISingleInsertResultInternal : IInsertResultInternal, IDataResultInternal, ISingleInsertResult
     {
-        void SetCompletedWithId(bool success, IColumnValuePair createdKeyId);
+        void SetCompletedWithId(IColumnValuePair createdKeyId);
     }
 
     internal class SingleInsertResult : InsertResult, ISingleInsertResultInternal
@@ -44,18 +44,16 @@ namespace Database.Internal
         #endregion
 
         #region Descendant Interface
-        public void SetCompletedWithId(bool success, IColumnValuePair createdKeyId)
+        public void SetCompletedWithId(IColumnValuePair createdKeyId)
         {
-            if (success)
-                CreatedKeyId = createdKeyId;
-
-            base.SetCompleted(success);
+            CreatedKeyId = createdKeyId;
+            base.SetCompleted(true);
         }
 
         public override void SetCompleted(bool success)
         {
             Debug.Assert(!success);
-            base.SetCompleted(success);
+            base.SetCompleted(false);
         }
         #endregion
     }

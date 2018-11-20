@@ -42,12 +42,17 @@ namespace Database.Internal
                     ISchemaDescriptor Schema = Table.Schema;
                     IReadOnlyCollection<IColumnDescriptor> TableStructure = Schema.Tables[Table];
                     bool Success = FillResult(Reader, TableStructure, out List<IResultRow> Rows);
-                    Result.SetCompletedWithResult(Success, Rows);
 
                     if (Success)
+                    {
+                        Result.SetCompletedWithRows(Rows);
                         return $"succeeded, {Rows.Count} row(s) returned";
+                    }
                     else
+                    {
+                        Result.SetCompleted(false);
                         return "failed";
+                    }
                 }
             }
             catch

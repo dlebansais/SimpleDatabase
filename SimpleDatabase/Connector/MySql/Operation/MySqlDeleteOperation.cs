@@ -37,15 +37,18 @@ namespace Database.Internal
         {
             try
             {
-                int DeletedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
-                int MinRowDelete = Context.ExpectedDeletedCount;
-                bool Success = (DeletedLines >= MinRowDelete);
-                Result.SetCompleted(Success);
+                int DeletedRowCount = Command.EndExecuteNonQuery(Result.AsyncResult);
 
-                if (Success)
-                    return $"succeeded, {DeletedLines} row(s) deleted";
+                if (DeletedRowCount >= Context.ExpectedDeletedCount)
+                {
+                    Result.SetCompletedWithCount(DeletedRowCount);
+                    return $"succeeded, {DeletedRowCount} row(s) deleted";
+                }
                 else
+                {
+                    Result.SetCompleted(false);
                     return "failed";
+                }
             }
             catch
             {

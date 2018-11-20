@@ -15,7 +15,6 @@ namespace Database.Internal
 {
     internal interface IMultiQueryResultInternal : IQueryResultInternal, IMultiQueryResult
     {
-        void SetCompletedWithResult(bool success, List<IResultRow> Rows);
     }
 
     internal class MultiQueryResult : QueryResult, IMultiQueryResultInternal

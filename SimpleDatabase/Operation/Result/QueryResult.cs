@@ -4,6 +4,7 @@ using System.Diagnostics;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents the result of a request that only query values in one or more tables, and does not modify them.
     /// </summary>
@@ -17,16 +18,19 @@ namespace Database
         /// </returns>
         IReadOnlyCollection<IResultRow> RowList { get; }
     }
+    #endregion
 }
 
 namespace Database.Internal
 {
     internal interface IQueryResultInternal : IResultInternal, IQueryResult
     {
+        void SetCompletedWithRows(List<IResultRow> Rows);
     }
 
     internal abstract class QueryResult : Result, IQueryResultInternal
     {
+        #region Init
         public QueryResult(IQueryOperation operation, IAsyncResult asyncResult)
             : base(operation, asyncResult)
         {
@@ -38,31 +42,29 @@ namespace Database.Internal
         {
             RowList = null;
         }
+        #endregion
 
         #region Properties
         public IReadOnlyCollection<IResultRow> RowList { get; private set; }
         #endregion
 
         #region Descendant Interface
-        public void SetCompletedWithResult(bool success, List<IResultRow> Rows)
+        public void SetCompletedWithRows(List<IResultRow> Rows)
         {
-            if (success)
-            {
-                List<IResultRow> Result = new List<IResultRow>();
+            List<IResultRow> Result = new List<IResultRow>();
 
-                foreach (IResultRow Row in Rows)
-                    Result.Add(Row);
+            foreach (IResultRow Row in Rows)
+                Result.Add(Row);
 
-                RowList = Result;
-            }
+            RowList = Result;
 
-            base.SetCompleted(success);
+            base.SetCompleted(true);
         }
 
         public override void SetCompleted(bool success)
         {
             Debug.Assert(!success);
-            base.SetCompleted(success);
+            base.SetCompleted(false);
         }
         #endregion
     }

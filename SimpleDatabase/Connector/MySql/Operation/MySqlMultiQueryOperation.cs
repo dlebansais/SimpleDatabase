@@ -41,12 +41,17 @@ namespace Database.Internal
                 using (MySqlDataReader Reader = Command.EndExecuteReader(Result.AsyncResult))
                 {
                     bool Success = FillResult(Reader, out List<IResultRow> Rows);
-                    Result.SetCompletedWithResult(Success, Rows);
 
                     if (Success)
+                    {
+                        Result.SetCompletedWithRows(Rows);
                         return $"succeeded, {Rows.Count} row(s) returned";
+                    }
                     else
+                    {
+                        Result.SetCompleted(false);
                         return "failed";
+                    }
                 }
             }
             catch

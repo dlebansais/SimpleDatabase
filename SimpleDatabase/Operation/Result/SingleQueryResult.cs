@@ -15,7 +15,6 @@ namespace Database.Internal
 {
     internal interface ISingleQueryResultInternal : IQueryResultInternal, ISingleQueryResult
     {
-        void SetCompletedWithResult(bool success, List<IResultRow> Rows);
     }
 
     internal class SingleQueryResult : QueryResult, ISingleQueryResultInternal

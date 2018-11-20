@@ -35,7 +35,6 @@ namespace Database.Internal
         public virtual string FinalizeOperation(MySqlCommand Command, ISingleInsertResultInternal Result)
         {
             IColumnValuePair CreatedKeyId = null;
-            bool Success;
             string Diagnostic;
 
             try
@@ -44,16 +43,15 @@ namespace Database.Internal
                 if (InsertedLines > 0)
                 {
                     CreatedKeyId = GetCreatedKeyId(Command, Result);
+                    Result.SetCompletedWithId(CreatedKeyId);
                     Diagnostic = $"succeeded, {InsertedLines} row(s) inserted";
-                    Success = true;
                 }
                 else
                 {
                     Diagnostic = "failed";
-                    Success = false;
+                    Result.SetCompleted(false);
                 }
 
-                Result.SetCompletedWithId(Success, CreatedKeyId);
                 return Diagnostic;
             }
             catch
