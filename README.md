@@ -11,8 +11,8 @@ A C# layer over MySql for basic operations. Strongly typed, async, nothrow.
 
 This class library provides access to databases seen as collections and dictionaries of schemas, tables, columns and rows. The object-oriented part appears when one adds custom data types.
 
-The library is strongly typed in that, if a column in the data contains data of a given type, all C# code using the library manipulate variables of that type, and no 'object' or 'var' is involved.
-Every operation other than setting up the environment has an xxAsync version that can be plugged to user interface as any other async method.
+The library is strongly typed in that, if a column in contains data of a given type, all C# code using the library manipulate variables of that type, and no `object` or `var` is involved.
+Every operation other than setting up the environment has an xxAsync version that can be plugged to a user interface as any other async method.
 
 When possible, methods of the library will not throw any exception. This doesn't apply to invalid arguments, although some combination of arguments can lead to invalid SQL text but may not be caught when the operation is initiated.
 
@@ -35,13 +35,13 @@ The code below provides a simple example of how to use the library. More complet
 
     ISingleInsertResult InsertResult = Database.Run(InsertContext);
     
-The code above opens the database and insert a new row with guid value `myguid` in the `mytest` table.
+The code above opens the database and insert a new row with guid value `myguid` in the *mytest* table.
 
 # Reference
 
 ## Defining your database
 
-A the core of the library is a database description class for your application. You define your own class, inheriting from SchemaDescriptor, and enumerate your tables and columns in the contructor. Below is a simple example, that defines two tables in a schema named *mytest*:
+A the core of the library is a database description class for your application. You define your own class, inheriting from `SchemaDescriptor`, and enumerate your tables and columns in the contructor. Below is a simple example, that defines two tables in a schema named *mytest*:
 
   ```cs
   public class TestSchema : SchemaDescriptor
@@ -73,7 +73,7 @@ In the remaining of the document, we will refer to this schema for examples.
 ## Setting up
 
 The library contains several methods to install the database (though it assumes the server is started).
-1. To create a new SQL user and a new SQL database, call the CreateCredential method.
+1. To create a new SQL user and a new SQL database, call the `CreateCredential` method.
 
   ```cs
   ICredential Credential = new Credential(Server, UserId, UserPassword, TestSchema);
@@ -105,7 +105,7 @@ All operations (queries, update, deleting...) are performed as follow.
 1. You create and fill a context object, for example `MultiQueryContext` (see the [Selecting data](#selecting-data) section for a specific example).
 2. You call the corresponding `Database.Run` method. There is one method per context type, all called `Run`.
 3. Alternatively, you call `Database.RunAsync` for asynchronous execution.
-4. When execution is completed, `Run` returns one of the `xxResult` objects, matching the context used. For instance, in the `MultiQueryContext`, it will return a `IMultiQueryResult` object.
+4. When execution is completed, `Run` returns one of the `xxResult` objects, matching the context used. For instance, in the `MultiQueryContext` case, it will return a `IMultiQueryResult` object.
 5. You can inspect the `Success` property of this object, and for query operations the `RowList` property.
 
 When a value is associated to a column, either because you insert it or because it's reported in the row list, the class used is `IColumnValuePair` with the specific type of the column. For example, `IColumnValuePair<Guid>` if the column contains guids.
@@ -120,7 +120,7 @@ The next sections describe each operation and their details.
 
 The library allows you to insert data either one row at a time, or several rows together.
 
-To insert a single row, create a `SingleInsertContext` object, with arguments the list of columns for which you provide a value. The following example inserts a new row in the Test0 table, providing the value for the column_guid column but not for other columns.
+To insert a single row, create a `SingleInsertContext` object, with arguments the list of columns for which you provide a value. The following example inserts a new row in the *Test0* table, providing the value for the *column_guid* column but not for other columns.
 
   ```cs
   ISingleInsertResult InsertResult = Database.Run(new SingleInsertContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, new Guid("{1BA0D7E9-039F-44E6-A966-CC67AC01A65D}")) }));
@@ -145,7 +145,7 @@ Here is an example of the former:
   IUpdateResult UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 10) }));
   ```
 
-This example replaces all values in `column_int`, in rows for which `column_guid` is equal to `guidKey`, with the int value `10`.
+This example replaces all values in *column_int*, in rows for which *column_guid* is equal to `guidKey`, with the int value `10`.
 
 Here is now an example of updating rows where several columns must match a given value:
 
@@ -153,7 +153,7 @@ Here is now an example of updating rows where several columns must match a given
   UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey), new ColumnValuePair<int>(TestSchema.Test0_Int, 10) }, new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 20) }));
   ```
 
-This time, rows that are updated are those for which `column_guid` is equal to `guidKey` and `column_int` is equal to `10`.
+This time, rows that are updated are those for which *column_guid* is equal to `guidKey` and *column_int* is equal to `10`.
 
 ## Deleting rows
 
