@@ -114,7 +114,7 @@
     <Compile Include="Connector\MySql\MySqlConnector.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlModifyOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlInsertOperation.cs" />
-    <Compile Include="Connector\MySql\Operation\MySqlJoiniQueryOperation.cs" />
+    <Compile Include="Connector\MySql\Operation\MySqlJoinQueryOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlDeleteOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlOperation.cs" />
     <Compile Include="Connector\MySql\Operation\MySqlQueryOperation.cs" />
