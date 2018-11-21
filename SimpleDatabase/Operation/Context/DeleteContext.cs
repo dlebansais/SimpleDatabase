@@ -139,5 +139,21 @@ namespace Database
         /// </returns>
         public int ExpectedDeletedCount { get; }
         #endregion
+
+        #region Debugging
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public override string ToString()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        {
+            string Text = $"Delete in table '{Table.Name}' at least {ExpectedDeletedCount} rows";
+
+            if (SingleConstraintEntry != null)
+                return Text + ", with single constraint";
+            else if (MultipleConstraintList != null)
+                return Text + ", with multiple constraints";
+            else
+                return Text + ", with no constraint";
+        }
+        #endregion
     }
 }

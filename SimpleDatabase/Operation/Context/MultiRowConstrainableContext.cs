@@ -30,7 +30,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request on a single table, with constraints.
     /// </summary>
-    public class MultiRowConstrainableContext : SingleTableOperationContext, IMultiRowConstrainableContext
+    public abstract class MultiRowConstrainableContext : SingleTableOperationContext, IMultiRowConstrainableContext
     {
         #region Init
         /// <summary>

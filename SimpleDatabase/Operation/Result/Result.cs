@@ -90,5 +90,17 @@ namespace Database.Internal
 
         private ManualResetEvent CompletedEvent;
         #endregion
+
+        #region Debugging
+        public override string ToString()
+        {
+            if (Success)
+                return $"Success";
+            else if (IsCompleted)
+                return $"Failed";
+            else
+                return $"...";
+        }
+        #endregion
     }
 }

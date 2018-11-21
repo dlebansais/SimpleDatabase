@@ -21,7 +21,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request over only one table.
     /// </summary>
-    public class SingleTableOperationContext : Context, ISingleTableOperationContext
+    public abstract class SingleTableOperationContext : Context, ISingleTableOperationContext
     {
         #region Init
         /// <summary>

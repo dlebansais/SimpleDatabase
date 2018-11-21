@@ -22,7 +22,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request over only one table, with constraints on some values.
     /// </summary>
-    public class SingleRowConstrainableContext : SingleTableOperationContext, ISingleRowConstrainableContext
+    public abstract class SingleRowConstrainableContext : SingleTableOperationContext, ISingleRowConstrainableContext
     {
         #region Init
         /// <summary>

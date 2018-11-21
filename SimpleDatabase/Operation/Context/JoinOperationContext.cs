@@ -23,7 +23,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request over several tables.
     /// </summary>
-    public class JoinOperationContext : Context, IJoinOperationContext
+    public abstract class JoinOperationContext : Context, IJoinOperationContext
     {
         #region Init
         /// <summary>

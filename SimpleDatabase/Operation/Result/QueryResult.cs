@@ -62,5 +62,17 @@ namespace Database.Internal
             base.SetCompleted(false);
         }
         #endregion
+
+        #region Debugging
+        public override string ToString()
+        {
+            if (Success)
+                return $"Success, {RowList.Count} row(s)";
+            else if (IsCompleted)
+                return $"Failed";
+            else
+                return $"...";
+        }
+        #endregion
     }
 }

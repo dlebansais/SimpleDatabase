@@ -125,5 +125,15 @@ namespace Database
         /// </returns>
         public IReadOnlyCollection<IColumnValueCollectionPair> EntryList { get; }
         #endregion
+
+        #region Debugging
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public override string ToString()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        {
+            string Text = $"Insert in table '{Table.Name}' {RowCount} row(s)";
+            return Text;
+        }
+        #endregion
     }
 }

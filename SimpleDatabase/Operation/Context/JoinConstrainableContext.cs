@@ -23,7 +23,7 @@ namespace Database
     /// <summary>
     ///     Represents initial parameters of a request over several tables, with constraints.
     /// </summary>
-    public class JoinConstrainableContext : JoinOperationContext, IJoinConstrainableContext
+    public abstract class JoinConstrainableContext : JoinOperationContext, IJoinConstrainableContext
     {
         #region Init
         /// <summary>
