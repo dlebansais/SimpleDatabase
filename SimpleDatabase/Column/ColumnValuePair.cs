@@ -73,7 +73,7 @@ namespace Database
     {
         #region Init
         /// <summary>
-        ///     Initializes a new instance of the <see cref="IColumnDescriptor{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ColumnValuePair{T}"/> class.
         /// </summary>
         /// <parameters>
         /// <param name="column">The column that contains the value.</param>

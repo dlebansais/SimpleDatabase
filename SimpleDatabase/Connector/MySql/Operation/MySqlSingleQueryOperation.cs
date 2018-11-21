@@ -32,11 +32,11 @@ namespace Database.Internal
             return Result + ";";
         }
 
-        public virtual string FinalizeOperation(MySqlCommand Command, ISingleQueryResultInternal Result)
+        public virtual string FinalizeOperation(MySqlCommand command, ISingleQueryResultInternal result)
         {
             try
             {
-                using (MySqlDataReader Reader = Command.EndExecuteReader(Result.AsyncResult))
+                using (MySqlDataReader Reader = command.EndExecuteReader(result.AsyncResult))
                 {
                     ITableDescriptor Table = Context.Table;
                     ISchemaDescriptor Schema = Table.Schema;
@@ -45,19 +45,19 @@ namespace Database.Internal
 
                     if (Success)
                     {
-                        Result.SetCompletedWithRows(Rows);
+                        result.SetCompletedWithRows(Rows);
                         return $"succeeded, {Rows.Count} row(s) returned";
                     }
                     else
                     {
-                        Result.SetCompleted(false);
+                        result.SetCompleted(false);
                         return "failed";
                     }
                 }
             }
             catch
             {
-                Result.SetCompleted(false);
+                result.SetCompleted(false);
                 throw;
             }
         }
@@ -95,7 +95,7 @@ namespace Database.Internal
             return Table.Name;
         }
 
-        protected virtual bool GetSingleConstraintString(out string ConstraintString)
+        protected virtual bool GetSingleConstraintString(out string constraintString)
         {
             ITableDescriptor Table = Context.Table;
             IColumnValueCollectionPair SingleConstraintEntry = Context.SingleConstraintEntry;
@@ -107,34 +107,34 @@ namespace Database.Internal
                 string ColumnName = ConstraintColumn.Name;
                 IColumnType ColumnType = ConstraintColumn.Type;
 
-                ConstraintString = "";
+                constraintString = "";
                 foreach (object Value in SingleConstraintEntry.ValueCollection)
                 {
-                    if (ConstraintString.Length > 0)
-                        ConstraintString += " OR ";
+                    if (constraintString.Length > 0)
+                        constraintString += " OR ";
 
                     string FormattedValue = ColumnType.ToSqlFormat(Value);
 
-                    ConstraintString += "(" + ColumnName + "=" + FormattedValue + ")";
+                    constraintString += "(" + ColumnName + "=" + FormattedValue + ")";
                 }
 
                 return true;
             }
             else
             {
-                ConstraintString = null;
+                constraintString = null;
                 return false;
             }
         }
 
-        private bool GetMultipleConstraintString(out string ConstraintString)
+        private bool GetMultipleConstraintString(out string constraintString)
         {
             ITableDescriptor Table = Context.Table;
             IReadOnlyCollection<IColumnValuePair> MultipleConstraintList = Context.MultipleConstraintList;
 
             string TableName = Table.Name;
 
-            ConstraintString = "";
+            constraintString = "";
             foreach (IColumnValuePair Entry in MultipleConstraintList)
             {
                 IColumnDescriptor ConstraintColumn = Entry.Column;
@@ -142,39 +142,39 @@ namespace Database.Internal
                 string ColumnName = ConstraintColumn.Name;
                 IColumnType ColumnType = ConstraintColumn.Type;
 
-                if (ConstraintString.Length > 0)
-                    ConstraintString += " AND ";
+                if (constraintString.Length > 0)
+                    constraintString += " AND ";
 
                 string FormattedValue = ColumnType.ToSqlFormat(Value);
-                ConstraintString += "(" + ColumnName + "=" + FormattedValue + ")";
+                constraintString += "(" + ColumnName + "=" + FormattedValue + ")";
             }
 
             return true;
         }
 
-        protected virtual bool GetConstraintString(out string ConstraintString)
+        protected virtual bool GetConstraintString(out string constraintString)
         {
             if (Context.MultipleConstraintList != null)
-                return GetMultipleConstraintString(out ConstraintString);
+                return GetMultipleConstraintString(out constraintString);
             else
-                return GetSingleConstraintString(out ConstraintString);
+                return GetSingleConstraintString(out constraintString);
         }
 
-        protected virtual bool FillResult(MySqlDataReader reader, IReadOnlyCollection<IColumnDescriptor> TableStructure, out List<IResultRow> Rows)
+        protected virtual bool FillResult(MySqlDataReader reader, IReadOnlyCollection<IColumnDescriptor> tableStructure, out List<IResultRow> rows)
         {
             IReadOnlyCollection<IColumnDescriptor> Filters = Context.Filters;
 
             if (Filters.Count == 0)
             {
                 IList<IColumnDescriptor> MinimalFilters = new List<IColumnDescriptor>();
-                foreach (IColumnDescriptor Entry in TableStructure)
+                foreach (IColumnDescriptor Entry in tableStructure)
                     MinimalFilters.Add(Entry);
 
                 Filters = (IReadOnlyCollection<IColumnDescriptor>)MinimalFilters;
             }
 
             string TableName = GetTableName();
-            Rows = new List<IResultRow>();
+            rows = new List<IResultRow>();
 
             while (reader.Read())
             {
@@ -188,7 +188,7 @@ namespace Database.Internal
                         NewResult.AddResult(Column, reader[ColumnName]);
                 }
 
-                Rows.Add(NewResult);
+                rows.Add(NewResult);
             }
 
             return true;

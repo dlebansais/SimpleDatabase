@@ -25,7 +25,7 @@ namespace Database.Internal
 {
     internal interface IQueryResultInternal : IResultInternal, IQueryResult
     {
-        void SetCompletedWithRows(List<IResultRow> Rows);
+        void SetCompletedWithRows(List<IResultRow> rows);
     }
 
     internal abstract class QueryResult : Result, IQueryResultInternal
@@ -49,14 +49,9 @@ namespace Database.Internal
         #endregion
 
         #region Descendant Interface
-        public void SetCompletedWithRows(List<IResultRow> Rows)
+        public void SetCompletedWithRows(List<IResultRow> rows)
         {
-            List<IResultRow> Result = new List<IResultRow>();
-
-            foreach (IResultRow Row in Rows)
-                Result.Add(Row);
-
-            RowList = Result;
+            RowList = new List<IResultRow>(rows).AsReadOnly();
 
             base.SetCompleted(true);
         }

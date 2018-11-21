@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents initial parameters of a request to update values in a row of a table, with constraints on the previous values.
     /// </summary>
@@ -16,6 +17,7 @@ namespace Database
         /// </returns>
         IReadOnlyCollection<IColumnValuePair> EntryList { get; }
     }
+    #endregion
 
     /// <summary>
     ///     Represents initial parameters of a request to update values in a row of a table, with constraints on the previous values.

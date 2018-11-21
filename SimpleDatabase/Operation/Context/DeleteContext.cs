@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents initial parameters of a request to delete rows in a table, with constraints.
     /// </summary>
@@ -16,6 +17,7 @@ namespace Database
         /// </returns>
         int ExpectedDeletedCount { get; }
     }
+    #endregion
 
     /// <summary>
     ///     Represents initial parameters of a request to delete rows in a table, with constraints.

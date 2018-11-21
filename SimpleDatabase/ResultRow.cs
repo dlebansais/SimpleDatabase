@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents values returned by a query.
     /// </summary>
@@ -23,6 +24,7 @@ namespace Database
         /// </returns>
         bool HasColumn(IColumnDescriptor column);
     }
+    #endregion
 }
 
 namespace Database
@@ -52,9 +54,9 @@ namespace Database
             return ColumnTable.ContainsKey(column);
         }
 
-        public virtual void AddResult(IColumnDescriptor Column, object Value)
+        public virtual void AddResult(IColumnDescriptor column, object value)
         {
-            ColumnTable.Add(Column, Value);
+            ColumnTable.Add(column, value);
         }
         #endregion
     }

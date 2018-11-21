@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents initial parameters of a request over only one table, with constraints on some values.
     /// </summary>
@@ -16,6 +17,7 @@ namespace Database
         /// </returns>
         IReadOnlyCollection<IColumnValuePair> ConstraintList { get; }
     }
+    #endregion
 
     /// <summary>
     ///     Represents initial parameters of a request over only one table, with constraints on some values.

@@ -2,6 +2,7 @@
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents initial parameters of a request over only one table.
     /// </summary>
@@ -15,6 +16,7 @@ namespace Database
         /// </returns>
         ITableDescriptor Table { get; }
     }
+    #endregion
 
     /// <summary>
     ///     Represents initial parameters of a request over only one table.

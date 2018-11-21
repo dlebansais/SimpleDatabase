@@ -3,6 +3,7 @@ using System.Threading;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents the result of a request.
     /// </summary>
@@ -32,10 +33,12 @@ namespace Database
         /// </returns>
         bool Success { get; }
     }
+    #endregion
 }
 
 namespace Database.Internal
 {
+    #region Interface
     internal interface IResultInternal : IResult
     {
         IOperation Operation { get; }
@@ -43,9 +46,11 @@ namespace Database.Internal
         void SetCompleted(bool success);
         void WaitCompleted();
     }
+    #endregion
 
     internal abstract class Result : IResultInternal
     {
+        #region Init
         public Result(IOperation operation, IAsyncResult asyncResult)
         {
             Operation = operation;
@@ -61,13 +66,17 @@ namespace Database.Internal
             Success = success;
             CompletedEvent = null;
         }
+        #endregion
 
+        #region Properties
         public IOperation Operation { get; }
         public bool IsStarted { get { return Success || AsyncResult != null; } }
         public bool IsCompleted { get { return Success || CompletedEvent.WaitOne(0); } }
         public bool Success { get; private set; }
         public IAsyncResult AsyncResult { get; }
+        #endregion
 
+        #region Client Interface
         public virtual void SetCompleted(bool success)
         {
             Success = success;
@@ -80,5 +89,6 @@ namespace Database.Internal
         }
 
         private ManualResetEvent CompletedEvent;
+        #endregion
     }
 }

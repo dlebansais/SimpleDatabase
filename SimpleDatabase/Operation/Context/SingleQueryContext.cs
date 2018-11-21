@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents initial parameters of a request that queries values on a single table, with constraints.
     /// </summary>
@@ -17,6 +18,7 @@ namespace Database
         /// </returns>
         IReadOnlyCollection<IColumnDescriptor> Filters { get; }
     }
+    #endregion
 
     /// <summary>
     ///     Represents initial parameters of a request that queries values on a single table, with constraints.

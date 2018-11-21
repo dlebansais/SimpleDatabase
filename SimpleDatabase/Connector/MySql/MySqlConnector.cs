@@ -813,11 +813,11 @@ namespace Database.Internal
             return ExecuteCommand(rootConnection, commandString, out int ErrorCode);
         }
 
-        private static bool ExecuteCommand(MySqlConnection RootConnection, string CommandString, out int errorCode)
+        private static bool ExecuteCommand(MySqlConnection rootConnection, string commandString, out int errorCode)
         {
             try
             {
-                using (MySqlCommand Command = new MySqlCommand(CommandString, RootConnection))
+                using (MySqlCommand Command = new MySqlCommand(commandString, rootConnection))
                 {
                     int Result = Command.ExecuteNonQuery();
                     errorCode = 0;
@@ -888,7 +888,7 @@ namespace Database.Internal
             }
         }
 
-        private static void CreateSchemaTables(ISchemaDescriptor schema, MySqlConnection RootConnection)
+        private static void CreateSchemaTables(ISchemaDescriptor schema, MySqlConnection rootConnection)
         {
             foreach (KeyValuePair<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>> TableEntry in schema.Tables)
             {
@@ -941,7 +941,7 @@ namespace Database.Internal
 
                 string CommandString = $"CREATE TABLE IF NOT EXISTS {TableName} ( { ColumnStringList} );";
                 TraceCommand(CommandString);
-                ExecuteCommand(RootConnection, CommandString);
+                ExecuteCommand(rootConnection, CommandString);
             }
         }
         #endregion

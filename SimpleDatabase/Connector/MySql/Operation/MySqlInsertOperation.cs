@@ -47,24 +47,24 @@ namespace Database.Internal
             return Result;
         }
 
-        public virtual string FinalizeOperation(MySqlCommand Command, IInsertResultInternal Result)
+        public virtual string FinalizeOperation(MySqlCommand command, IInsertResultInternal result)
         {
             IColumnValuePair LastCreatedKeyId = null;
             string Diagnostic;
 
             try
             {
-                int InsertedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
+                int InsertedLines = command.EndExecuteNonQuery(result.AsyncResult);
 
                 if (InsertedLines > 0)
                 {
-                    LastCreatedKeyId = GetLastCreatedKeyId(Command, Result);
-                    Result.SetCompletedWithId(LastCreatedKeyId);
+                    LastCreatedKeyId = GetLastCreatedKeyId(command, result);
+                    result.SetCompletedWithId(LastCreatedKeyId);
                     Diagnostic = $"succeeded, {InsertedLines} rows inserted";
                 }
                 else
                 {
-                    Result.SetCompleted(false);
+                    result.SetCompleted(false);
                     Diagnostic = "failed";
                 }
 
@@ -72,7 +72,7 @@ namespace Database.Internal
             }
             catch
             {
-                Result.SetCompleted(false);
+                result.SetCompleted(false);
                 throw;
             }
         }
@@ -86,7 +86,7 @@ namespace Database.Internal
             return Table.Name;
         }
 
-        protected virtual void GetInitialValueString(out string ColumnString, out ICollection<string> ValueStringList)
+        protected virtual void GetInitialValueString(out string columnString, out ICollection<string> valueStringList)
         {
             ITableDescriptor Table = Context.Table;
             IReadOnlyCollection<IColumnValueCollectionPair> EntryList = Context.EntryList;
@@ -96,7 +96,7 @@ namespace Database.Internal
             Debug.Assert(EntryList.Count > 0);
             string TableName = GetTableName();
 
-            ColumnString = "";
+            columnString = "";
             string[] StringList = new string[RowCount];
             for (int i = 0; i < RowCount; i++)
                 StringList[i] = "";
@@ -109,9 +109,9 @@ namespace Database.Internal
                 IEnumerable ValueCollection = DataEntry.ValueCollection;
                 string ColumnName = Column.Name;
 
-                if (ColumnString.Length > 0)
-                    ColumnString += ", ";
-                ColumnString += ColumnName;
+                if (columnString.Length > 0)
+                    columnString += ", ";
+                columnString += ColumnName;
 
                 int i = 0;
                 foreach (object Value in ValueCollection)
@@ -141,9 +141,9 @@ namespace Database.Internal
                 IEnumerable ValueCollection = Entry.ValueCollection;
                 string ColumnName = Column.Name;
 
-                if (ColumnString.Length > 0)
-                    ColumnString += ", ";
-                ColumnString += ColumnName;
+                if (columnString.Length > 0)
+                    columnString += ", ";
+                columnString += ColumnName;
 
                 int i = 0;
                 foreach (object Value in ValueCollection)
@@ -162,7 +162,7 @@ namespace Database.Internal
                 Debug.Assert(i == RowCount);
             }
 
-            ValueStringList = StringList;
+            valueStringList = StringList;
         }
 
         protected virtual IColumnValuePair GetLastCreatedKeyId(MySqlCommand command, IInsertResultInternal result)

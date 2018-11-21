@@ -91,6 +91,14 @@ The library contains several methods to install the database (though it assumes 
   Database.CreateTables(Credential);
   ```
 
+## Accuracy of DateTime
+
+The default format for C# `DateTime` values is the "DATETIME(6)" MySQL format. This format doesn't store time as accurately as `DateTime`, but is human-readable.
+
+If accuracy is more relevant for you, set the optional argument `dateTimeAsTick` to true when calling the `SchemaDescriptor` constructor, and the "BIGINT" MySQL format will be used instead.
+
+This setting applies to all tables of a schema. To overwrite it for a single column, specify the `dateTimeAsTick` argument when creating the column. 
+
 ## Opening the database
 
 For every run of your application, you need to open a new session:

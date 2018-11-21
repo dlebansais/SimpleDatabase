@@ -33,26 +33,26 @@ namespace Database.Internal
             return Result;
         }
 
-        public virtual string FinalizeOperation(MySqlCommand Command, IDeleteResultInternal Result)
+        public virtual string FinalizeOperation(MySqlCommand command, IDeleteResultInternal result)
         {
             try
             {
-                int DeletedRowCount = Command.EndExecuteNonQuery(Result.AsyncResult);
+                int DeletedRowCount = command.EndExecuteNonQuery(result.AsyncResult);
 
                 if (DeletedRowCount >= Context.ExpectedDeletedCount)
                 {
-                    Result.SetCompletedWithCount(DeletedRowCount);
+                    result.SetCompletedWithCount(DeletedRowCount);
                     return $"succeeded, {DeletedRowCount} row(s) deleted";
                 }
                 else
                 {
-                    Result.SetCompleted(false);
+                    result.SetCompleted(false);
                     return "failed";
                 }
             }
             catch
             {
-                Result.SetCompleted(false);
+                result.SetCompleted(false);
                 throw;
             }
         }

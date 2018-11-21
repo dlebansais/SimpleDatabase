@@ -34,29 +34,29 @@ namespace Database.Internal
             return Result + ";";
         }
 
-        public virtual string FinalizeOperation(MySqlCommand Command, IJoinQueryResultInternal Result)
+        public virtual string FinalizeOperation(MySqlCommand command, IJoinQueryResultInternal result)
         {
             try
             {
-                using (MySqlDataReader Reader = Command.EndExecuteReader(Result.AsyncResult))
+                using (MySqlDataReader Reader = command.EndExecuteReader(result.AsyncResult))
                 {
                     bool Success = FillResult(Reader, out List<IResultRow> Rows);
 
                     if (Success)
                     {
-                        Result.SetCompletedWithRows(Rows);
+                        result.SetCompletedWithRows(Rows);
                         return $"succeeded, {Rows.Count} row(s) returned";
                     }
                     else
                     {
-                        Result.SetCompleted(false);
+                        result.SetCompleted(false);
                         return "failed";
                     }
                 }
             }
             catch
             {
-                Result.SetCompleted(false);
+                result.SetCompleted(false);
                 throw;
             }
         }
@@ -157,13 +157,13 @@ namespace Database.Internal
             return JoinResult;
         }
 
-        protected virtual bool GetConstraintString(out string ConstraintString)
+        protected virtual bool GetConstraintString(out string constraintString)
         {
             IReadOnlyDictionary<ITableDescriptor, IColumnValueCollectionPair> Constraints = Context.Constraints;
 
             if (Constraints.Count > 0)
             {
-                ConstraintString = "";
+                constraintString = "";
                 foreach (KeyValuePair<ITableDescriptor, IColumnValueCollectionPair> Entry in Constraints)
                 {
                     ITableDescriptor Table = Entry.Key;
@@ -175,13 +175,13 @@ namespace Database.Internal
 
                     foreach (object Value in ValueList)
                     {
-                        if (ConstraintString.Length > 0)
-                            ConstraintString += " OR ";
+                        if (constraintString.Length > 0)
+                            constraintString += " OR ";
 
                         IColumnType ColumnType = Column.Type;
                         string FormattedValue = ColumnType.ToSqlFormat(Value);
 
-                        ConstraintString += "(" + TableName + "." + ColumnName + "=" + FormattedValue + ")";
+                        constraintString += "(" + TableName + "." + ColumnName + "=" + FormattedValue + ")";
                     }
                 }
 
@@ -190,17 +190,17 @@ namespace Database.Internal
 
             else
             {
-                ConstraintString = null;
+                constraintString = null;
                 return false;
             }
         }
 
-        protected virtual bool FillResult(MySqlDataReader Reader, out List<IResultRow> Rows)
+        protected virtual bool FillResult(MySqlDataReader reader, out List<IResultRow> rows)
         {
             IReadOnlyDictionary<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>> Filters = Context.Filters;
 
-            Rows = new List<IResultRow>();
-            while (Reader.Read())
+            rows = new List<IResultRow>();
+            while (reader.Read())
             {
                 IResultRowInternal NewResult = new ResultRow();
 
@@ -215,16 +215,16 @@ namespace Database.Internal
                         string ColumnName = Column.Name;
                         string ResultName = TableName + "_" + ColumnName;
 
-                        int Index = Reader.GetOrdinal(ResultName);
-                        if (Reader.IsDBNull(Index))
+                        int Index = reader.GetOrdinal(ResultName);
+                        if (reader.IsDBNull(Index))
                             continue;
 
-                        object ConvertedValue = Reader[ResultName];
+                        object ConvertedValue = reader[ResultName];
                         NewResult.AddResult(Column, ConvertedValue);
                     }
                 }
 
-                Rows.Add(NewResult);
+                rows.Add(NewResult);
             }
 
             return true;

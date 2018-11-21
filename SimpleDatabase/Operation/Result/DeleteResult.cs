@@ -3,6 +3,7 @@ using System.Diagnostics;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents the result of a request to delete rows in a table, with constraints.
     /// </summary>
@@ -16,6 +17,7 @@ namespace Database
         /// </returns>
         int DeletedRowCount { get; }
     }
+    #endregion
 }
 
 namespace Database.Internal

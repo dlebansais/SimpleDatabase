@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents initial parameters of a request to insert several values in a table.
     /// </summary>
@@ -25,6 +26,7 @@ namespace Database
         /// </returns>
         IReadOnlyCollection<IColumnValueCollectionPair> EntryList { get; }
     }
+    #endregion
 
     /// <summary>
     ///     Represents initial parameters of a request to insert several values in a table.

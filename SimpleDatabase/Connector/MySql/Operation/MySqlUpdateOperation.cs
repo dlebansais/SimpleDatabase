@@ -31,13 +31,13 @@ namespace Database.Internal
             return Result + ";";
         }
 
-        public virtual string FinalizeOperation(MySqlCommand Command, IUpdateResultInternal Result)
+        public virtual string FinalizeOperation(MySqlCommand command, IUpdateResultInternal result)
         {
             try
             {
-                int ModifiedLines = Command.EndExecuteNonQuery(Result.AsyncResult);
+                int ModifiedLines = command.EndExecuteNonQuery(result.AsyncResult);
                 bool Success = ModifiedLines > 0;
-                Result.SetCompleted(Success);
+                result.SetCompleted(Success);
 
                 if (Success)
                     return $"succeeded, {ModifiedLines} row(s) modified";
@@ -46,7 +46,7 @@ namespace Database.Internal
             }
             catch
             {
-                Result.SetCompleted(false);
+                result.SetCompleted(false);
                 throw;
             }
         }

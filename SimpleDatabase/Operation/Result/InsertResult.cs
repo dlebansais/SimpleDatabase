@@ -3,6 +3,7 @@ using System.Diagnostics;
 
 namespace Database
 {
+    #region Interface
     /// <summary>
     ///     Represents the result of a request to insert several values in a table.
     /// </summary>
@@ -16,6 +17,7 @@ namespace Database
         /// </returns>
         IColumnValuePair LastCreatedKeyId { get; }
     }
+    #endregion
 }
 
 namespace Database.Internal
