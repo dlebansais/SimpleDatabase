@@ -1,8 +1,8 @@
 # Status: beta
 TODO:
-- [ ] Testing.
+- [X] Testing.
 - [ ] Synchronous execution of fast requests.
-- [ ] Doc and example.
+- [X] Doc and example.
 
 # Simple Database
 A C# layer over MySql for basic operations. Strongly typed, async, nothrow.
