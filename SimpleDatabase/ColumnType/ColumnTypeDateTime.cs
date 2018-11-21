@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Database.Types
 {
@@ -52,7 +53,7 @@ namespace Database.Types
         /// <returns>
         ///     The underlying SQL type.
         /// </returns>
-        public override string SqlType { get { return DateTimeAsTicks ? "BIGINT" : "DATETIME"; } }
+        public override string SqlType { get { return DateTimeAsTicks ? "BIGINT" : "DATETIME(6)"; } }
         #endregion
 
         #region Client Interface
@@ -66,11 +67,11 @@ namespace Database.Types
         ///     A string that represents <paramref name="value"/> for a SQL request.
         /// </returns>
         public override string ToSqlFormat(DateTime value)
-        {
+        {//"YYYY-MM-DD HH:MM:SS"
             if (DateTimeAsTicks)
                 return value.Ticks.ToString();
             else
-                return value.ToString();
+                return $"'{value.ToString("yyyy-MM-dd HH:mm:ss.ffffff")}'";
         }
 
         /// <summary>

@@ -940,6 +940,7 @@ namespace Database.Internal
                 }
 
                 string CommandString = $"CREATE TABLE IF NOT EXISTS {TableName} ( { ColumnStringList} );";
+                TraceCommand(CommandString);
                 ExecuteCommand(RootConnection, CommandString);
             }
         }

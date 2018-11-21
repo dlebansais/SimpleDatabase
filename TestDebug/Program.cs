@@ -2,6 +2,7 @@
 using Database.Types;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Test;
 
 namespace TestDebug
@@ -23,14 +24,14 @@ namespace TestDebug
             ISimpleDatabase Database = new SimpleDatabase();
             Database.Initialize(ConnectorType.MySql, ConnectionOption.KeepAlive);
 
-            ITestSchema TestSchema = new TestSchema();
+            ITestSchema TestSchema = new TestSchema(false);
             ICredential Credential = new Credential("localhost", "test", "test", TestSchema);
 
             bool Success;
             List<IResultRow> RowList;
             IInsertResult InsertResult;
             IDeleteResult DeleteResult;
-            IJoinQueryResult QueryResult;
+            //IJoinQueryResult QueryResult;
             IUpdateResult UpdateResult;
             ISingleQueryResult SelectResult;
 
@@ -42,34 +43,40 @@ namespace TestDebug
 
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test0, 0));
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test1, 0));
-
-            InsertResult = Database.Run(new InsertContext(TestSchema.Test0, 3, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<Guid>(TestSchema.Test0_Guid, new List<Guid>() { guidKey0, guidKey1, guidKey2 }) }));
-            UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey1), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 2) }));
-            UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey2), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 3) }));
-
-            SelectResult = Database.Run(new SingleQueryContext(TestSchema.Test0, new List<IColumnDescriptor>() { TestSchema.Test0_Guid, TestSchema.Test0_Int }));
-            RowList = new List<IResultRow>(SelectResult.RowList);
-
-            SelectResult = Database.Run(new SingleQueryContext(TestSchema.Test0, new ColumnValueCollectionPair<int>(TestSchema.Test0_Int, new List<int>() { 3 }), new List<IColumnDescriptor>() { TestSchema.Test0_Guid, TestSchema.Test0_Int }));
-            RowList = new List<IResultRow>(SelectResult.RowList);
-            TestSchema.Test0_Int.TryParseRow(RowList[0], out int Test0_Row_0_1);
+            DeleteResult = Database.Run(new DeleteContext(TestSchema.Test2, 0));
 
 
 
-            InsertResult = Database.Run(new InsertContext(TestSchema.Test0, 3, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<Guid>(TestSchema.Test0_Guid, new List<Guid>() { guidKey0, guidKey1, guidKey2 }) }));
-            InsertResult = Database.Run(new InsertContext(TestSchema.Test1, 4, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<string>(TestSchema.Test1_String, new List<string>() { "row 0", "row 1", "row 2", "row 3" }) }));
-            UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey1), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 2) }));
-            UpdateResult = Database.Run(new UpdateContext(TestSchema.Test0, new ColumnValuePair<Guid>(TestSchema.Test0_Guid, guidKey2), new List<IColumnValuePair>() { new ColumnValuePair<int>(TestSchema.Test0_Int, 3) }));
 
-            Dictionary<IColumnDescriptor, IColumnDescriptor> Join = new Dictionary<IColumnDescriptor, IColumnDescriptor>()
+            List<DateTime> Dates0 = new List<DateTime>()
             {
-                { TestSchema.Test1_Int, TestSchema.Test0_Int },
+                new DateTime(2000, 10, 15, 10, 9, 58, 244, DateTimeKind.Utc),
+                DateTime.UtcNow,
+                new DateTime(2012, 2, 22, 7, 54, 32, 687, DateTimeKind.Utc),
             };
-            QueryResult = Database.Run(new JoinQueryContext(Join, new List<IColumnDescriptor>() { TestSchema.Test1_String, TestSchema.Test0_Guid }));
+            List<DateTime> Dates1 = new List<DateTime>()
+            {
+                new DateTime(2034, 1, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            };
+            InsertResult = Database.Run(new InsertContext(TestSchema.Test2, 3, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<DateTime>(TestSchema.Test2_DateTime, Dates0), }));
+
+            Thread.Sleep(1000);
+            UpdateResult = Database.Run(new UpdateContext(TestSchema.Test2, new ColumnValuePair<DateTime>(TestSchema.Test2_DateTime, Dates0[2]), new List<IColumnValuePair>() { new ColumnValuePair<DateTime>(TestSchema.Test2_DateTime, Dates1[0]) }));
+
+            SelectResult = Database.Run(new SingleQueryContext(TestSchema.Test2, TestSchema.Test2.All));
+
+            RowList = new List<IResultRow>(SelectResult.RowList);
+            Success = (TestSchema.Test2_DateTime.TryParseRow(RowList[0], out DateTime Test0_Row_0_1) && Test0_Row_0_1 == Dates0[0]);
+            if (TestSchema.DateTimeAsTicks)
+                Success = (TestSchema.Test2_DateTime.TryParseRow(RowList[1], out DateTime Test0_Row_1_1) && Test0_Row_1_1 == Dates0[1]);
+            Success = (TestSchema.Test2_DateTime.TryParseRow(RowList[2], out DateTime Test0_Row_2_1) && Test0_Row_2_1 == Dates1[0]);
+
+
 
 
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test0, 0));
             DeleteResult = Database.Run(new DeleteContext(TestSchema.Test1, 0));
+            DeleteResult = Database.Run(new DeleteContext(TestSchema.Test2, 0));
 
             Database.Close();
             Database.DeleteTables(Credential);
