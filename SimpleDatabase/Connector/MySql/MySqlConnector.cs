@@ -621,35 +621,37 @@ namespace Database.Internal
 
         public override void NotifyOperationCompleted(IActiveOperation activeOperation)
         {
+            Debug.Assert(activeOperation is IMySqlActiveOperation);
             if (activeOperation is IMySqlActiveOperation AsMySqlActiveOperation)
-            {
-                try
-                {
-                    using (MySqlCommand Command = ActiveOperationTable[AsMySqlActiveOperation])
-                    {
-                        ActiveOperationTable.Remove(AsMySqlActiveOperation);
-                        string Diagnostic = AsMySqlActiveOperation.MySqlFinalizerBase(Command, activeOperation.ResultBase);
+                NotifyOperationCompleted(AsMySqlActiveOperation);
+        }
 
-                        TraceCommandEnd(Command, Diagnostic);
-                    }
-                }
-#if TRACE
-                catch (ApplicationException)
+        private void NotifyOperationCompleted(IMySqlActiveOperation activeOperation)
+        {
+            try
+            {
+                using (MySqlCommand Command = ActiveOperationTable[activeOperation])
                 {
-                    throw;
-                }
-#endif
-                catch (MySqlException e)
-                {
-                    TraceMySqlException(e);
-                }
-                catch (Exception e)
-                {
-                    TraceException(e);
+                    ActiveOperationTable.Remove(activeOperation);
+                    string Diagnostic = activeOperation.MySqlFinalizerBase(Command, activeOperation.ResultBase);
+
+                    TraceCommandEnd(Command, Diagnostic);
                 }
             }
-            else
-                throw new InvalidCastException("Invalid operation");
+#if TRACE
+            catch (ApplicationException)
+            {
+                throw;
+            }
+#endif
+            catch (MySqlException e)
+            {
+                TraceMySqlException(e);
+            }
+            catch (Exception e)
+            {
+                TraceException(e);
+            }
         }
 
         private static void TraceCommand(MySqlCommand command)
