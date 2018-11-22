@@ -263,7 +263,6 @@ namespace Database
         public SimpleDatabase()
         {
             Connector = null;
-            ConnectionMutex = new Mutex();
         }
 
         /// <summary>
@@ -325,7 +324,6 @@ namespace Database
         }
 
         private IDatabaseConnector Connector;
-        private Mutex ConnectionMutex;
         #endregion
 
         #region Properties
@@ -511,6 +509,9 @@ namespace Database
             Debug.Assert(Connector != null);
             Debug.Assert(!Connector.IsOpen);
 
+            if (Connector.IsOpen)
+                return false;
+
             return ExecuteOpen(credential);
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -519,6 +520,9 @@ namespace Database
         {
             Debug.Assert(Connector != null);
             Debug.Assert(!Connector.IsOpen);
+
+            if (Connector.IsOpen)
+                return Task.Run(() => false);
 
             return Task.Run(() => ExecuteOpen(credential));
         }
@@ -535,8 +539,6 @@ namespace Database
         /// </returns>
         protected virtual bool ExecuteOpen(ICredential credential)
         {
-            ConnectionMutex.WaitOne(Timeout.InfiniteTimeSpan);
-
             bool Success;
             if (Connector.Open(credential))
             {
@@ -546,10 +548,7 @@ namespace Database
                 Success = true;
             }
             else
-            {
-                ConnectionMutex.ReleaseMutex();
                 Success = false;
-            }
 
             return Success;
         }
@@ -974,12 +973,6 @@ namespace Database
         {
             if (IsOpen)
                 ExecuteClose();
-
-            if (ConnectionMutex != null)
-            {
-                ConnectionMutex.Dispose();
-                ConnectionMutex = null;
-            }
         }
 
         /// <summary>
