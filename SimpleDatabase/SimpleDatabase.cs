@@ -23,6 +23,16 @@ namespace Database
         void Initialize(ConnectorType connectorType, ConnectionOption connectionOption);
 
         /// <summary>
+        ///     Initializes the database, loading the engine associated to <paramref name="connectorType"/>.
+        /// </summary>
+        /// <parameters>
+        /// <param name="connectorType">The engine backing the database.</param>
+        /// <param name="connectionOption">Options related to connection to a server.</param>
+        /// <param name="isDebugTraceEnabled">True to turn traces on.</param>
+        /// </parameters>
+        void Initialize(ConnectorType connectorType, ConnectionOption connectionOption, bool isDebugTraceEnabled);
+
+        /// <summary>
         ///     Gets the engine backing the database.
         /// </summary>
         /// <returns>
@@ -37,6 +47,14 @@ namespace Database
         ///     The options related to connection to a server
         /// </returns>
         ConnectionOption ConnectionOption { get; }
+
+        /// <summary>
+        ///     Indicates if debug traces are ON or OFF
+        /// </summary>
+        /// <returns>
+        ///     True if debug traces are ON.
+        /// </returns>
+        bool IsDebugTraceEnabled { get; }
 
         /// <summary>
         ///     Gets the last error code returned by the database engine.
@@ -257,6 +275,19 @@ namespace Database
         /// </parameters>
         public virtual void Initialize(ConnectorType connectorType, ConnectionOption connectionOption)
         {
+            Initialize(connectorType, connectionOption, false);
+        }
+
+        /// <summary>
+        ///     Initializes the database, loading the engine associated to <paramref name="connectorType"/>.
+        /// </summary>
+        /// <parameters>
+        /// <param name="connectorType">The engine backing the database.</param>
+        /// <param name="connectionOption">Options related to connection to a server.</param>
+        /// <param name="isDebugTraceEnabled">True to turn traces on.</param>
+        /// </parameters>
+        public virtual void Initialize(ConnectorType connectorType, ConnectionOption connectionOption, bool isDebugTraceEnabled)
+        {
             Debug.Assert(Connector == null);
             if (Connector != null)
                 return;
@@ -276,7 +307,9 @@ namespace Database
                         throw new ArgumentOutOfRangeException(nameof(connectorType));
                 }
 
-                Debugging.Print("Connector created: " + Connector.ToString());
+                IsDebugTraceEnabled = isDebugTraceEnabled;
+                if (IsDebugTraceEnabled)
+                    Debugging.Print("Connector created: " + Connector.ToString());
             }
 #if TRACE
             catch (ApplicationException)
@@ -286,7 +319,8 @@ namespace Database
 #endif
             catch (Exception e)
             {
-                Debugging.PrintExceptionMessage(e.Message);
+                if (IsDebugTraceEnabled)
+                    Debugging.PrintExceptionMessage(e.Message);
             }
         }
 
@@ -310,6 +344,22 @@ namespace Database
         ///     The options related to connection to a server
         /// </returns>
         public ConnectionOption ConnectionOption { get; private set; }
+
+        /// <summary>
+        ///     Indicates if debug traces are ON or OFF
+        /// </summary>
+        /// <returns>
+        ///     True if debug traces are ON.
+        /// </returns>
+        public bool IsDebugTraceEnabled
+        {
+            get { return Connector != null ? Connector.IsDebugTraceEnabled : false; }
+            private set
+            {
+                if (Connector != null)
+                    Connector.IsDebugTraceEnabled = value;
+            }
+        }
 
         /// <summary>
         ///     Gets the last error code returned by the database engine.
@@ -823,7 +873,8 @@ namespace Database
 #endif
             catch (Exception e)
             {
-                Debugging.PrintExceptionMessage(e.Message);
+                if (IsDebugTraceEnabled)
+                    Debugging.PrintExceptionMessage(e.Message);
                 OperationThread = null;
             }
         }

@@ -22,7 +22,7 @@ namespace TestDebug
             string RootPassword = args[1];
 
             ISimpleDatabase Database = new SimpleDatabase();
-            Database.Initialize(ConnectorType.MySql, ConnectionOption.KeepAlive);
+            Database.Initialize(ConnectorType.MySql, ConnectionOption.KeepAlive, true);
 
             ITestSchema TestSchema = new TestSchema(false);
             ICredential Credential = new Credential("localhost", "test", "test", TestSchema);

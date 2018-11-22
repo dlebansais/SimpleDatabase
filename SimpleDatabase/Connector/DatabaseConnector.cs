@@ -21,6 +21,7 @@ namespace Database.Internal
         IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context);
         void NotifyOperationCompleted(IActiveOperation activeOperation);
 
+        bool IsDebugTraceEnabled { get; set; }
         int LastErrorCode { get; }
     }
 
@@ -43,6 +44,7 @@ namespace Database.Internal
         public abstract IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context);
         public abstract void NotifyOperationCompleted(IActiveOperation activeOperation);
 
+        public abstract bool IsDebugTraceEnabled { get; set; }
         public abstract int LastErrorCode { get; }
         public abstract int IgnoreErrorCode { get; set; }
         public abstract bool CanIntBeNULL { get; }

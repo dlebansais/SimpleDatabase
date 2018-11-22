@@ -1,7 +1,7 @@
 # Status: beta
 TODO:
 - [X] Testing.
-- [ ] Synchronous execution of fast requests.
+- [X] Synchronous execution of fast requests.
 - [X] Doc and example.
 
 # Simple Database

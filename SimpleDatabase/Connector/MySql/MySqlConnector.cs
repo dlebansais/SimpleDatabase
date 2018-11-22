@@ -660,17 +660,20 @@ namespace Database.Internal
 
         private static void TraceCommand(MySqlCommand command)
         {
-            Debugging.Print($"MySql command ({command.GetHashCode()}): {command.CommandText}");
+            if (_IsDebugTraceEnabled)
+                Debugging.Print($"MySql command ({command.GetHashCode()}): {command.CommandText}");
         }
 
         private static void TraceCommand(string commandText)
         {
-            Debugging.Print($"MySql command: {commandText}");
+            if (_IsDebugTraceEnabled)
+                Debugging.Print($"MySql command: {commandText}");
         }
 
         private static void TraceCommandEnd(MySqlCommand command, string diagnostic)
         {
-            Debugging.Print($"MySql command ({command.GetHashCode()}) {diagnostic}");
+            if (_IsDebugTraceEnabled)
+                Debugging.Print($"MySql command ({command.GetHashCode()}) {diagnostic}");
         }
 
         private static void TraceMySqlException(MySqlException e, [CallerMemberName] string CallerName = "")
@@ -684,9 +687,10 @@ namespace Database.Internal
             if (e.Number == _IgnoreErrorCode)
             {
                 _IgnoreErrorCode = 0;
-                Debugging.Print(Message);
+                if (_IsDebugTraceEnabled)
+                    Debugging.Print(Message);
             }
-            else
+            else if (_IsDebugTraceEnabled)
                 Debugging.PrintExceptionMessage(Message);
         }
 
@@ -696,7 +700,8 @@ namespace Database.Internal
             string ServerVersionInfo = (ServerVersion != null ? $", Server Version: {ServerVersion}" : "");
             string Message = $"Exception{CallerNameInfo}{ServerVersionInfo}: {e.Message}";
 
-            Debugging.PrintExceptionMessage(Message);
+            if (_IsDebugTraceEnabled)
+                Debugging.PrintExceptionMessage(Message);
         }
 
         private void StartWatch(out Stopwatch watch)
@@ -712,10 +717,15 @@ namespace Database.Internal
                 Thread.Sleep(Remaining);
         }
 
-        public override int IgnoreErrorCode { get { return _IgnoreErrorCode; } set { _IgnoreErrorCode = value; } }
-        private static int _IgnoreErrorCode { get; set; }
+        public override bool IsDebugTraceEnabled { get { return _IsDebugTraceEnabled; } set { _IsDebugTraceEnabled = value; } }
+        private static bool _IsDebugTraceEnabled;
+
         public override int LastErrorCode { get { return _LastErrorCode; } }
         private static int _LastErrorCode;
+
+        public override int IgnoreErrorCode { get { return _IgnoreErrorCode; } set { _IgnoreErrorCode = value; } }
+        private static int _IgnoreErrorCode { get; set; }
+
         public override bool CanIntBeNULL { get { return ServerVersionMajor >= 8; } }
 
         private Dictionary<IMySqlActiveOperation, MySqlCommand> ActiveOperationTable;
@@ -749,7 +759,7 @@ namespace Database.Internal
         }
         #endregion
 
-        #region Initialization
+        #region Tools
         public static void ReadServerVersion(MySqlConnection rootConnection)
         {
             if (ServerVersion != null)
@@ -807,7 +817,8 @@ namespace Database.Internal
                     }
                 }
 
-                Debugging.Print(Result);
+                if (_IsDebugTraceEnabled)
+                    Debugging.Print(Result);
             }
             catch
             {
