@@ -274,7 +274,7 @@ namespace Database
         /// </parameters>
         public virtual void Initialize(ConnectorType connectorType, ConnectionOption connectionOption)
         {
-            Initialize(connectorType, connectionOption, false);
+            Initialize(connectorType, connectionOption, true);
         }
 
         /// <summary>
