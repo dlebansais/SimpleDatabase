@@ -16,6 +16,11 @@ namespace Database.Types
     /// </summary>
     public class ColumnTypeBoolean : ColumnTypeBase<bool>, IColumnTypeBoolean
     {
+        #region Init
+        private ColumnTypeBoolean() { }
+        internal static IColumnTypeBoolean Instance = new ColumnTypeBoolean();
+        #endregion
+
         #region Properties
         /// <summary>
         ///     Gets the underlying SQL type.

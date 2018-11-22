@@ -31,7 +31,7 @@ namespace Database.Types
         ///     <paramref name="name"/> is null or empty.
         /// </exception>
         public ColumnDescriptorByteArray(ITableDescriptor table, string name)
-            : base(table, name, new ColumnTypeByteArray())
+            : base(table, name, ColumnTypeByteArray.Instance)
         {
         }
         #endregion

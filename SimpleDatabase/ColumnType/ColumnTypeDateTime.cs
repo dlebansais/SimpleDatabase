@@ -26,16 +26,9 @@ namespace Database.Types
     public class ColumnTypeDateTime : ColumnTypeBase<DateTime>, IColumnTypeDateTime
     {
         #region Init
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ColumnTypeDateTime"/> class and adds it to the table it belongs to.
-        /// </summary>
-        /// <parameters>
-        /// <param name="dateTimeAsTicks">Indicates if the DateTime type is stored as a tick count.</param>
-        /// </parameters>
-        public ColumnTypeDateTime(bool dateTimeAsTicks)
-        {
-            DateTimeAsTicks = dateTimeAsTicks;
-        }
+        private ColumnTypeDateTime(bool dateTimeAsTicks) { DateTimeAsTicks = dateTimeAsTicks; }
+        internal static IColumnTypeDateTime AsDateTimeInstance = new ColumnTypeDateTime(false);
+        internal static IColumnTypeDateTime AsTicksInstance = new ColumnTypeDateTime(true);
         #endregion
 
         #region Properties

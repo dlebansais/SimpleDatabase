@@ -44,7 +44,7 @@ namespace Database
                 throw new ArgumentNullException(nameof(column1));
             if (column1.Table == column2.Table)
                 throw new ArgumentException("Invalid join");
-            if (column1.Type != column2.Table)
+            if (column1.Type != column2.Type)
                 throw new ArgumentException("Invalid join");
 
             Columns = new Dictionary<IColumnDescriptor, IColumnDescriptor>()

@@ -71,6 +71,8 @@ namespace TestDebug
                 Success = (TestSchema.Test2_DateTime.TryParseRow(RowList[1], out DateTime Test0_Row_1_1) && Test0_Row_1_1 == Dates0[1]);
             Success = (TestSchema.Test2_DateTime.TryParseRow(RowList[2], out DateTime Test0_Row_2_1) && Test0_Row_2_1 == Dates1[0]);
 
+            IJoin Join = new LeftJoin(TestSchema.Test1_Int, TestSchema.Test0_Int);
+            Database.Run(new JoinQueryContext(Join, new List<IColumnDescriptor>() { TestSchema.Test1_String, TestSchema.Test0_Guid }));
 
 
 

@@ -31,7 +31,7 @@ namespace Database.Types
         ///     <paramref name="name"/> is null or empty.
         /// </exception>
         public ColumnDescriptorString(ITableDescriptor table, string name)
-            : base(table, name, new ColumnTypeString())
+            : base(table, name, ColumnTypeString.Instance)
         {
         }
         #endregion

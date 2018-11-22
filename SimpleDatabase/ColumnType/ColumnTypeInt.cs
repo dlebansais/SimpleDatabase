@@ -16,6 +16,11 @@ namespace Database.Types
     /// </summary>
     public class ColumnTypeInt : ColumnTypeBase<int>, IColumnTypeInt
     {
+        #region Init
+        private ColumnTypeInt() { }
+        internal static IColumnTypeInt Instance = new ColumnTypeInt();
+        #endregion
+
         #region Properties
         /// <summary>
         ///     Gets the underlying SQL type.

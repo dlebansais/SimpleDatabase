@@ -17,6 +17,11 @@ namespace Database.Types
     /// </summary>
     public class ColumnTypeGuid : ColumnTypeBase<Guid>, IColumnTypeGuid
     {
+        #region Init
+        private ColumnTypeGuid() { }
+        internal static IColumnTypeGuid Instance = new ColumnTypeGuid();
+        #endregion
+
         #region Properties
         /// <summary>
         ///     Gets the underlying SQL type.

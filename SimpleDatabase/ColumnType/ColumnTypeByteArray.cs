@@ -16,6 +16,11 @@ namespace Database.Types
     /// </summary>
     public class ColumnTypeByteArray : ColumnTypeBase<byte[]>, IColumnTypeByteArray
     {
+        #region Init
+        private ColumnTypeByteArray() { }
+        internal static IColumnTypeByteArray Instance = new ColumnTypeByteArray();
+        #endregion
+
         #region Properties
         /// <summary>
         ///     Gets the underlying SQL type.
