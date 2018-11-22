@@ -54,13 +54,10 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="join"/> is null.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="join"/> does not describe a valid join.
-        /// </exception>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="filterList"/> is null.
         /// </exception>
-        public JoinQueryContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnDescriptor> filterList)
+        public JoinQueryContext(IJoin join, IEnumerable<IColumnDescriptor> filterList)
             : base(join)
         {
             InitFilters(filterList);
@@ -99,16 +96,13 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="join"/> is null.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="join"/> does not describe a valid join.
-        /// </exception>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="constraintList"/> is null.
         /// </exception>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="filterList"/> is null.
         /// </exception>
-        public JoinQueryContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnValueCollectionPair> constraintList, IEnumerable<IColumnDescriptor> filterList)
+        public JoinQueryContext(IJoin join, IEnumerable<IColumnValueCollectionPair> constraintList, IEnumerable<IColumnDescriptor> filterList)
             : base(join, constraintList)
         {
             InitFilters(filterList);

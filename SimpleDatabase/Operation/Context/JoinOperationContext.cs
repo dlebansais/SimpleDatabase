@@ -1,6 +1,4 @@
-﻿using Database.Types;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace Database
 {
@@ -16,7 +14,7 @@ namespace Database
         /// <returns>
         ///     The join describing how tables are connected in the query.
         /// </returns>
-        IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> Join { get; }
+        IJoin Join { get; }
     }
     #endregion
 
@@ -32,7 +30,7 @@ namespace Database
         /// </summary>
         public JoinOperationContext()
         {
-            Join = new Dictionary<IColumnDescriptor, IColumnDescriptor>();
+            Join = EmptyJoin.Join;
         }
 
         /// <summary>
@@ -44,43 +42,9 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="join"/> is null.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="join"/> does not describe a valid join.
-        /// </exception>
-        public JoinOperationContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join)
+        public JoinOperationContext(IJoin join)
         {
             Join = join ?? throw new ArgumentNullException(nameof(join));
-            if (!IsJoinValid(join))
-                throw new ArgumentException(nameof(join));
-        }
-
-        private bool IsJoinValid(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join)
-        {
-            Dictionary<IColumnDescriptor, IColumnDescriptor> TestJoin = new Dictionary<IColumnDescriptor, IColumnDescriptor>();
-            foreach (KeyValuePair<IColumnDescriptor, IColumnDescriptor> Entry in Join)
-                TestJoin.Add(Entry.Key, Entry.Value);
-
-            while (TestJoin.Count > 0)
-            {
-                IColumnDescriptor TestColumn = null;
-                foreach (KeyValuePair<IColumnDescriptor, IColumnDescriptor> Entry in TestJoin)
-                {
-                    TestColumn = Entry.Key;
-                    break;
-                }
-
-                IColumnDescriptor NextColumn = TestColumn;
-                while (NextColumn != null && TestJoin.ContainsKey(NextColumn))
-                {
-                    NextColumn = TestJoin[NextColumn];
-                    TestJoin.Remove(TestColumn);
-
-                    if (NextColumn == TestColumn)
-                        return false;
-                }
-            }
-
-            return true;
         }
         #endregion
 
@@ -91,7 +55,7 @@ namespace Database
         /// <returns>
         ///     The join describing how tables are connected in the query.
         /// </returns>
-        public IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> Join { get; }
+        public IJoin Join { get; }
         #endregion
     }
 }

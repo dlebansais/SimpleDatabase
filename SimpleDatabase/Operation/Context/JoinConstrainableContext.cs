@@ -32,7 +32,6 @@ namespace Database
         ///     This request has no constraints.
         /// </summary>
         public JoinConstrainableContext()
-            : base()
         {
             Constraints = new Dictionary<ITableDescriptor, IColumnValueCollectionPair>();
         }
@@ -47,10 +46,7 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="join"/> is null.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="join"/> does not describe a valid join.
-        /// </exception>
-        public JoinConstrainableContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join)
+        public JoinConstrainableContext(IJoin join)
             : base(join)
         {
             Constraints = new Dictionary<ITableDescriptor, IColumnValueCollectionPair>();
@@ -69,7 +65,6 @@ namespace Database
         ///     <paramref name="constraintList"/> is null.
         /// </exception>
         public JoinConstrainableContext(IEnumerable<IColumnValueCollectionPair> constraintList)
-            : base()
         {
             if (constraintList == null)
                 throw new ArgumentNullException(nameof(constraintList));
@@ -89,13 +84,10 @@ namespace Database
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="join"/> is null.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="join"/> does not describe a valid join.
-        /// </exception>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="constraintList"/> is null.
         /// </exception>
-        public JoinConstrainableContext(IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> join, IEnumerable<IColumnValueCollectionPair> constraintList)
+        public JoinConstrainableContext(IJoin join, IEnumerable<IColumnValueCollectionPair> constraintList)
             : base(join)
         {
             if (constraintList == null)

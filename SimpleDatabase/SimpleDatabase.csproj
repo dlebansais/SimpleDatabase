@@ -157,6 +157,9 @@
     <Compile Include="ResultRow.cs" />
     <Compile Include="Schema\SchemaDescriptor.cs" />
     <Compile Include="SimpleDatabase.cs" />
+    <Compile Include="Table\EmptyJoin.cs" />
+    <Compile Include="Table\Join.cs" />
+    <Compile Include="Table\LeftJoin.cs" />
     <Compile Include="Table\TableDescriptor.cs" />
   </ItemGroup>
   <ItemGroup>

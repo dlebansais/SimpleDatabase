@@ -65,7 +65,7 @@ namespace Database.Internal
         protected virtual string GetFilterString()
         {
             IReadOnlyDictionary<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>> Filters = Context.Filters;
-            IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> Join = Context.Join;
+            IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> Join = Context.Join.Columns;
 
             List<ITableDescriptor> TableList = new List<ITableDescriptor>();
             foreach (KeyValuePair<IColumnDescriptor, IColumnDescriptor> Entry in Join)
@@ -118,7 +118,7 @@ namespace Database.Internal
 
         protected virtual string GetTableReference()
         {
-            IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> Join = Context.Join;
+            IReadOnlyDictionary<IColumnDescriptor, IColumnDescriptor> Join = Context.Join.Columns;
 
             string JoinResult = "";
             foreach (KeyValuePair<IColumnDescriptor, IColumnDescriptor> Entry in Join)
