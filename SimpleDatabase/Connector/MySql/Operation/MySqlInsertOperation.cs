@@ -64,7 +64,7 @@ namespace Database.Internal
                 }
                 else
                 {
-                    result.SetCompleted(false);
+                    result.SetCompleted(false, ResultError.ErrorLineNotInserted);
                     Diagnostic = "failed";
                 }
 
@@ -72,7 +72,7 @@ namespace Database.Internal
             }
             catch
             {
-                result.SetCompleted(false);
+                result.SetCompleted(false, ResultError.ErrorExceptionCompletingInsert);
                 throw;
             }
         }

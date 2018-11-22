@@ -23,8 +23,8 @@ namespace Database.Internal
         {
         }
 
-        public SingleQueryResult(bool success)
-            : base(success)
+        public SingleQueryResult(bool success, ResultError errorCode)
+            : base(success, errorCode)
         {
         }
     }

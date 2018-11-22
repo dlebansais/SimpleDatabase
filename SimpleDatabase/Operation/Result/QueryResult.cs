@@ -37,8 +37,8 @@ namespace Database.Internal
             RowList = null;
         }
 
-        public QueryResult(bool success)
-            : base(success)
+        public QueryResult(bool success, ResultError errorCode)
+            : base(success, errorCode)
         {
             RowList = null;
         }
@@ -60,6 +60,12 @@ namespace Database.Internal
         {
             Debug.Assert(!success);
             base.SetCompleted(false);
+        }
+
+        public override void SetCompleted(bool success, ResultError errorCode)
+        {
+            Debug.Assert(!success);
+            base.SetCompleted(false, errorCode);
         }
         #endregion
 

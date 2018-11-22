@@ -605,7 +605,7 @@ namespace Database
         protected virtual ISingleQueryResult Execute(ISingleQueryContext context)
         {
             if (!IsOperationThreadStarted)
-                return new SingleQueryResult(false);
+                return new SingleQueryResult(false, ResultError.ErrorFatalNoOperationThread);
 
             IActiveOperation<ISingleQueryResultInternal> ActiveOperation = Connector.SingleQuery(context);
             ISingleQueryResultInternal Result = ActiveOperation.Result;
@@ -655,7 +655,7 @@ namespace Database
         protected virtual IJoinQueryResult Execute(IJoinQueryContext context)
         {
             if (!IsOperationThreadStarted)
-                return new JoinQueryResult(false);
+                return new JoinQueryResult(false, ResultError.ErrorFatalNoOperationThread);
 
             IActiveOperation<IJoinQueryResultInternal> ActiveOperation = Connector.JoinQuery(context);
             IJoinQueryResultInternal Result = ActiveOperation.Result;
@@ -705,7 +705,7 @@ namespace Database
         protected virtual IUpdateResult Execute(IUpdateContext context)
         {
             if (!IsOperationThreadStarted)
-                return new UpdateResult(false);
+                return new UpdateResult(false, ResultError.ErrorFatalNoOperationThread);
 
             IActiveOperation<IUpdateResultInternal> ActiveOperation = Connector.Update(context);
             IUpdateResultInternal Result = ActiveOperation.Result;
@@ -755,10 +755,10 @@ namespace Database
         protected virtual IInsertResult Execute(IInsertContext context)
         {
             if (!IsOperationThreadStarted)
-                return new InsertResult(false);
+                return new InsertResult(false, ResultError.ErrorFatalNoOperationThread);
 
             if (context.RowCount == 0 || context.EntryList.Count == 0)
-                return new InsertResult(true);
+                return new InsertResult(true, ResultError.ErrorNone);
 
             IActiveOperation<IInsertResultInternal> ActiveOperation = Connector.Insert(context);
             IInsertResultInternal Result = ActiveOperation.Result;
@@ -808,7 +808,7 @@ namespace Database
         protected virtual IDeleteResult Execute(IDeleteContext context)
         {
             if (!IsOperationThreadStarted)
-                return new DeleteResult(false);
+                return new DeleteResult(false, ResultError.ErrorFatalNoOperationThread);
 
             IActiveOperation<IDeleteResultInternal> ActiveOperation = Connector.Delete(context);
             IDeleteResultInternal Result = ActiveOperation.Result;

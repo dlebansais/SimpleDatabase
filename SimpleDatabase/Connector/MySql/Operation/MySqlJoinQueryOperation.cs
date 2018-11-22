@@ -39,23 +39,14 @@ namespace Database.Internal
             {
                 using (MySqlDataReader Reader = command.EndExecuteReader(result.AsyncResult))
                 {
-                    bool Success = FillResult(Reader, out List<IResultRow> Rows);
-
-                    if (Success)
-                    {
-                        result.SetCompletedWithRows(Rows);
-                        return $"succeeded, {Rows.Count} row(s) returned";
-                    }
-                    else
-                    {
-                        result.SetCompleted(false);
-                        return "failed";
-                    }
+                    FillResult(Reader, out List<IResultRow> Rows);
+                    result.SetCompletedWithRows(Rows);
+                    return $"succeeded, {Rows.Count} row(s) returned";
                 }
             }
             catch
             {
-                result.SetCompleted(false);
+                result.SetCompleted(false, ResultError.ErrorExceptionCompletingJoinQuery);
                 throw;
             }
         }
@@ -194,7 +185,7 @@ namespace Database.Internal
             }
         }
 
-        protected virtual bool FillResult(MySqlDataReader reader, out List<IResultRow> rows)
+        protected virtual void FillResult(MySqlDataReader reader, out List<IResultRow> rows)
         {
             IReadOnlyDictionary<ITableDescriptor, IReadOnlyCollection<IColumnDescriptor>> Filters = Context.Filters;
 
@@ -225,8 +216,6 @@ namespace Database.Internal
 
                 rows.Add(NewResult);
             }
-
-            return true;
         }
         #endregion
     }

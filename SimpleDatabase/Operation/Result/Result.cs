@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Database
@@ -32,6 +33,14 @@ namespace Database
         ///     True if the request is successful, False if it has not started, has not been completed, or has failed.
         /// </returns>
         bool Success { get; }
+
+        /// <summary>
+        ///     Gets an error code if <see cref="Success"/> is false.
+        /// </summary>
+        /// <returns>
+        ///     The an error code if <see cref="Success"/> is false.
+        /// </returns>
+        ResultError ErrorCode { get; }
     }
     #endregion
 }
@@ -46,6 +55,7 @@ namespace Database.Internal
         void CheckIfCompletedSynchronously(out bool isCompletedSynchronously);
         bool IsCompletedSynchronously { get; }
         void SetCompleted(bool success);
+        void SetCompleted(bool success, ResultError errorCode);
         void WaitCompleted();
     }
     #endregion
@@ -61,11 +71,14 @@ namespace Database.Internal
             CompletedEvent = new ManualResetEvent(false);
         }
 
-        public Result(bool success)
+        public Result(bool success, ResultError errorCode)
         {
+            Debug.Assert((success && errorCode == ResultError.ErrorNone) || (!success && errorCode != ResultError.ErrorNone));
+
             Operation = null;
             AsyncResult = null;
             Success = success;
+            ErrorCode = errorCode;
             CompletedEvent = null;
         }
         #endregion
@@ -76,6 +89,7 @@ namespace Database.Internal
         public bool IsCompletedSynchronously { get; private set; }
         public bool IsCompleted { get { return Success || CompletedEvent.WaitOne(0); } }
         public bool Success { get; private set; }
+        public ResultError ErrorCode { get; private set; }
         public IAsyncResult AsyncResult { get; }
         #endregion
 
@@ -89,6 +103,13 @@ namespace Database.Internal
         public virtual void SetCompleted(bool success)
         {
             Success = success;
+            CompletedEvent.Set();
+        }
+
+        public virtual void SetCompleted(bool success, ResultError errorCode)
+        {
+            Success = success;
+            ErrorCode = errorCode;
             CompletedEvent.Set();
         }
 

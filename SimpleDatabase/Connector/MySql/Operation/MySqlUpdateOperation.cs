@@ -36,17 +36,20 @@ namespace Database.Internal
             try
             {
                 int ModifiedLines = command.EndExecuteNonQuery(result.AsyncResult);
-                bool Success = ModifiedLines > 0;
-                result.SetCompleted(Success);
-
-                if (Success)
+                if (ModifiedLines > 0)
+                {
+                    result.SetCompleted(true);
                     return $"succeeded, {ModifiedLines} row(s) modified";
+                }
                 else
+                {
+                    result.SetCompleted(false, ResultError.ErrorNoRowModified);
                     return "failed";
+                }
             }
             catch
             {
-                result.SetCompleted(false);
+                result.SetCompleted(false, ResultError.ErrorExceptionCompletingUpdate);
                 throw;
             }
         }

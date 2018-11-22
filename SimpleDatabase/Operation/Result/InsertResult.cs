@@ -35,8 +35,8 @@ namespace Database.Internal
         {
         }
 
-        public InsertResult(bool success)
-            : base(success)
+        public InsertResult(bool success, ResultError errorCode)
+            : base(success, errorCode)
         {
         }
         #endregion
@@ -56,6 +56,12 @@ namespace Database.Internal
         {
             Debug.Assert(!success);
             base.SetCompleted(false);
+        }
+
+        public override void SetCompleted(bool success, ResultError errorCode)
+        {
+            Debug.Assert(!success);
+            base.SetCompleted(false, errorCode);
         }
         #endregion
 

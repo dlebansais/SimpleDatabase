@@ -36,8 +36,8 @@ namespace Database.Internal
             DeletedRowCount = -1;
         }
 
-        public DeleteResult(bool success)
-            : base(success)
+        public DeleteResult(bool success, ResultError errorCode)
+            : base(success, errorCode)
         {
             DeletedRowCount = -1;
         }
@@ -58,6 +58,12 @@ namespace Database.Internal
         {
             Debug.Assert(!success);
             base.SetCompleted(false);
+        }
+
+        public override void SetCompleted(bool success, ResultError errorCode)
+        {
+            Debug.Assert(!success);
+            base.SetCompleted(false, errorCode);
         }
         #endregion
 

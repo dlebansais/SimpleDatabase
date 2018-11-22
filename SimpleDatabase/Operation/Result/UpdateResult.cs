@@ -23,8 +23,8 @@ namespace Database.Internal
         {
         }
 
-        public UpdateResult(bool success)
-            : base(success)
+        public UpdateResult(bool success, ResultError errorCode)
+            : base(success, errorCode)
         {
         }
     }

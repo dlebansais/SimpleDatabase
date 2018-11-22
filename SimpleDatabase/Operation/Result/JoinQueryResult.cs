@@ -23,8 +23,8 @@ namespace Database.Internal
         {
         }
 
-        public JoinQueryResult(bool success)
-            : base(success)
+        public JoinQueryResult(bool success, ResultError errorCode)
+            : base(success, errorCode)
         {
         }
     }

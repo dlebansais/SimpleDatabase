@@ -46,13 +46,13 @@ namespace Database.Internal
                 }
                 else
                 {
-                    result.SetCompleted(false);
+                    result.SetCompleted(false, ResultError.ErrorMissingDeletedRows);
                     return "failed";
                 }
             }
             catch
             {
-                result.SetCompleted(false);
+                result.SetCompleted(false, ResultError.ErrorExceptionCompletingDelete);
                 throw;
             }
         }

@@ -41,23 +41,15 @@ namespace Database.Internal
                     ITableDescriptor Table = Context.Table;
                     ISchemaDescriptor Schema = Table.Schema;
                     IReadOnlyCollection<IColumnDescriptor> TableStructure = Schema.Tables[Table];
-                    bool Success = FillResult(Reader, TableStructure, out List<IResultRow> Rows);
+                    FillResult(Reader, TableStructure, out List<IResultRow> Rows);
 
-                    if (Success)
-                    {
-                        result.SetCompletedWithRows(Rows);
-                        return $"succeeded, {Rows.Count} row(s) returned";
-                    }
-                    else
-                    {
-                        result.SetCompleted(false);
-                        return "failed";
-                    }
+                    result.SetCompletedWithRows(Rows);
+                    return $"succeeded, {Rows.Count} row(s) returned";
                 }
             }
             catch
             {
-                result.SetCompleted(false);
+                result.SetCompleted(false, ResultError.ErrorExceptionCompletingQuery);
                 throw;
             }
         }
@@ -160,7 +152,7 @@ namespace Database.Internal
                 return GetSingleConstraintString(out constraintString);
         }
 
-        protected virtual bool FillResult(MySqlDataReader reader, IReadOnlyCollection<IColumnDescriptor> tableStructure, out List<IResultRow> rows)
+        protected virtual void FillResult(MySqlDataReader reader, IReadOnlyCollection<IColumnDescriptor> tableStructure, out List<IResultRow> rows)
         {
             IReadOnlyCollection<IColumnDescriptor> Filters = Context.Filters;
 
@@ -190,8 +182,6 @@ namespace Database.Internal
 
                 rows.Add(NewResult);
             }
-
-            return true;
         }
         #endregion
     }

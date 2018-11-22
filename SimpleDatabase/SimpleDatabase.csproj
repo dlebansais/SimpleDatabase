@@ -154,6 +154,7 @@
     <Compile Include="Operation\SingleQueryOperation.cs" />
     <Compile Include="Operation\UpdateOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResultError.cs" />
     <Compile Include="ResultRow.cs" />
     <Compile Include="Schema\SchemaDescriptor.cs" />
     <Compile Include="SimpleDatabase.cs" />

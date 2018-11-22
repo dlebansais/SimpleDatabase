@@ -444,7 +444,7 @@ namespace Database.Internal
                     }
 
                 if (!HasPrimary && (PrimaryKey is IColumnDescriptorGuid))
-                    return new ActiveOperation<IInsertResultInternal>(new InsertResult(false));
+                    return new ActiveOperation<IInsertResultInternal>(new InsertResult(false, ResultError.ErrorPrimaryKeyRequired));
             }
 
             IMySqlInsertOperation Operation = new MySqlInsertOperation(context);
