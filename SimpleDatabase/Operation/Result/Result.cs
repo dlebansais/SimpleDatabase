@@ -43,6 +43,8 @@ namespace Database.Internal
     {
         IOperation Operation { get; }
         IAsyncResult AsyncResult { get; }
+        void CheckIfCompletedSynchronously(out bool isCompletedSynchronously);
+        bool IsCompletedSynchronously { get; }
         void SetCompleted(bool success);
         void WaitCompleted();
     }
@@ -71,12 +73,19 @@ namespace Database.Internal
         #region Properties
         public IOperation Operation { get; }
         public bool IsStarted { get { return Success || AsyncResult != null; } }
+        public bool IsCompletedSynchronously { get; private set; }
         public bool IsCompleted { get { return Success || CompletedEvent.WaitOne(0); } }
         public bool Success { get; private set; }
         public IAsyncResult AsyncResult { get; }
         #endregion
 
         #region Client Interface
+        public virtual void CheckIfCompletedSynchronously(out bool isCompletedSynchronously)
+        {
+            IsCompletedSynchronously = AsyncResult != null && AsyncResult.IsCompleted;
+            isCompletedSynchronously = IsCompletedSynchronously;
+        }
+
         public virtual void SetCompleted(bool success)
         {
             Success = success;

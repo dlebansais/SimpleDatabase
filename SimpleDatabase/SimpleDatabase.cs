@@ -560,15 +560,9 @@ namespace Database
 
             IActiveOperation<ISingleQueryResultInternal> ActiveOperation = Connector.SingleQuery(context);
             ISingleQueryResultInternal Result = ActiveOperation.Result;
+            FinalizeOrQueue(ActiveOperation);
 
-            if (Result.IsStarted)
-            {
-                ActiveOperationTable.Add(ActiveOperation);
-                NewOperationEvent.Set();
-                Result.WaitCompleted();
-            }
-
-            return ActiveOperation.Result;
+            return Result;
         }
         #endregion
 
@@ -616,13 +610,7 @@ namespace Database
 
             IActiveOperation<IJoinQueryResultInternal> ActiveOperation = Connector.JoinQuery(context);
             IJoinQueryResultInternal Result = ActiveOperation.Result;
-
-            if (Result.IsStarted)
-            {
-                ActiveOperationTable.Add(ActiveOperation);
-                NewOperationEvent.Set();
-                Result.WaitCompleted();
-            }
+            FinalizeOrQueue(ActiveOperation);
 
             return Result;
         }
@@ -672,13 +660,7 @@ namespace Database
 
             IActiveOperation<IUpdateResultInternal> ActiveOperation = Connector.Update(context);
             IUpdateResultInternal Result = ActiveOperation.Result;
-
-            if (Result.IsStarted)
-            {
-                ActiveOperationTable.Add(ActiveOperation);
-                NewOperationEvent.Set();
-                Result.WaitCompleted();
-            }
+            FinalizeOrQueue(ActiveOperation);
 
             return Result;
         }
@@ -731,13 +713,7 @@ namespace Database
 
             IActiveOperation<IInsertResultInternal> ActiveOperation = Connector.Insert(context);
             IInsertResultInternal Result = ActiveOperation.Result;
-
-            if (Result.IsStarted)
-            {
-                ActiveOperationTable.Add(ActiveOperation);
-                NewOperationEvent.Set();
-                Result.WaitCompleted();
-            }
+            FinalizeOrQueue(ActiveOperation);
 
             return Result;
         }
@@ -787,13 +763,7 @@ namespace Database
 
             IActiveOperation<IDeleteResultInternal> ActiveOperation = Connector.Delete(context);
             IDeleteResultInternal Result = ActiveOperation.Result;
-
-            if (Result.IsStarted)
-            {
-                ActiveOperationTable.Add(ActiveOperation);
-                NewOperationEvent.Set();
-                Result.WaitCompleted();
-            }
+            FinalizeOrQueue(ActiveOperation);
 
             return Result;
         }
@@ -910,6 +880,24 @@ namespace Database
             ShutdownEvent.Set();
             OperationThread.Join();
             OperationThread = null;
+        }
+
+        private void FinalizeOrQueue(IActiveOperation activeOperation)
+        {
+            IResultInternal Result = activeOperation.ResultBase;
+            if (Result.IsStarted)
+            {
+                Result.CheckIfCompletedSynchronously(out bool IsCompletedSynchronously);
+
+                if (IsCompletedSynchronously)
+                    Connector.NotifyOperationCompleted(activeOperation);
+                else
+                {
+                    ActiveOperationTable.Add(activeOperation);
+                    NewOperationEvent.Set();
+                    Result.WaitCompleted();
+                }
+            }
         }
 
         private Thread OperationThread;

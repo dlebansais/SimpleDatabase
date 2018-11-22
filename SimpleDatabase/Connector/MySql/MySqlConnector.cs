@@ -633,7 +633,11 @@ namespace Database.Internal
                 using (MySqlCommand Command = ActiveOperationTable[activeOperation])
                 {
                     ActiveOperationTable.Remove(activeOperation);
-                    string Diagnostic = activeOperation.MySqlFinalizerBase(Command, activeOperation.ResultBase);
+                    IResultInternal Result = activeOperation.ResultBase;
+                    string Diagnostic = activeOperation.MySqlFinalizerBase(Command, Result);
+
+                    if (Result.IsCompletedSynchronously)
+                        Diagnostic += " [SYNCHRONOUS]";
 
                     TraceCommandEnd(Command, Diagnostic);
                 }
