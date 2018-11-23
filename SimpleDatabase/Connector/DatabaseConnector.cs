@@ -19,7 +19,7 @@ namespace Database.Internal
         IActiveOperation<IUpdateResultInternal> Update(IUpdateContext context);
         IActiveOperation<IInsertResultInternal> Insert(IInsertContext context);
         IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context);
-        void NotifyOperationCompleted(IActiveOperation activeOperation);
+        void NotifyOperationCompleted(IActiveOperation activeOperation, out Exception completionException);
 
         bool IsDebugTraceEnabled { get; set; }
         int LastErrorCode { get; }
@@ -42,7 +42,7 @@ namespace Database.Internal
         public abstract IActiveOperation<IUpdateResultInternal> Update(IUpdateContext context);
         public abstract IActiveOperation<IInsertResultInternal> Insert(IInsertContext context);
         public abstract IActiveOperation<IDeleteResultInternal> Delete(IDeleteContext context);
-        public abstract void NotifyOperationCompleted(IActiveOperation activeOperation);
+        public abstract void NotifyOperationCompleted(IActiveOperation activeOperation, out Exception completionException);
 
         public abstract bool IsDebugTraceEnabled { get; set; }
         public abstract int LastErrorCode { get; }

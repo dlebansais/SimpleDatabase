@@ -619,15 +619,20 @@ namespace Database.Internal
             return ActiveOperation;
         }
 
-        public override void NotifyOperationCompleted(IActiveOperation activeOperation)
+        public override void NotifyOperationCompleted(IActiveOperation activeOperation, out Exception completionException)
         {
             Debug.Assert(activeOperation is IMySqlActiveOperation);
+
             if (activeOperation is IMySqlActiveOperation AsMySqlActiveOperation)
-                NotifyOperationCompleted(AsMySqlActiveOperation);
+                NotifyOperationCompleted(AsMySqlActiveOperation, out completionException);
+            else
+                completionException = null;
         }
 
-        private void NotifyOperationCompleted(IMySqlActiveOperation activeOperation)
+        private void NotifyOperationCompleted(IMySqlActiveOperation activeOperation, out Exception completionException)
         {
+            completionException = null;
+
             try
             {
                 using (MySqlCommand Command = ActiveOperationTable[activeOperation])
@@ -654,6 +659,7 @@ namespace Database.Internal
             }
             catch (Exception e)
             {
+                completionException = e;
                 TraceException(e);
             }
         }

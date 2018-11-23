@@ -878,7 +878,21 @@ namespace Database
             }
         }
 
-        private bool IsOperationThreadStarted { get { return OperationThread != null; } }
+        private bool IsOperationThreadStarted
+        {
+            get
+            {
+                if (LastCompletionException != null)
+                {
+                    Exception e = LastCompletionException;
+                    LastCompletionException = null;
+
+                    throw e;
+                }
+                else
+                    return OperationThread != null;
+            }
+        }
 
         private void ExecuteOperation()
         {
@@ -914,7 +928,9 @@ namespace Database
                         IActiveOperation ActiveOperation = ActiveOperations[OperationWaitResult - 1];
                         ActiveOperationTable.Remove(ActiveOperation);
 
-                        Connector.NotifyOperationCompleted(ActiveOperation);
+                        Connector.NotifyOperationCompleted(ActiveOperation, out Exception CompletionException);
+                        if (LastCompletionException == null && CompletionException != null)
+                            LastCompletionException = CompletionException;
                     }
                     else
                         Exit = true;
@@ -940,7 +956,11 @@ namespace Database
                 Result.CheckIfCompletedSynchronously(out bool IsCompletedSynchronously);
 
                 if (IsCompletedSynchronously)
-                    Connector.NotifyOperationCompleted(activeOperation);
+                {
+                    Connector.NotifyOperationCompleted(activeOperation, out Exception CompletionException);
+                    if (CompletionException != null)
+                        throw CompletionException;
+                }
                 else
                 {
                     ActiveOperationTable.Add(activeOperation);
@@ -954,6 +974,7 @@ namespace Database
         private AutoResetEvent NewOperationEvent;
         private ManualResetEvent ShutdownEvent;
         private IList<IActiveOperation> ActiveOperationTable;
+        private Exception LastCompletionException;
         #endregion
 
         #region Implementation of IDisposable
