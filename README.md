@@ -1,17 +1,11 @@
-# Status: beta
-TODO:
-- [X] Testing.
-- [X] Synchronous execution of fast requests.
-- [X] Doc and example.
-
 # Simple Database
-A C# layer over MySql for basic operations. Strongly typed, async, nothrow.
+A C# layer over MySql for basic operations. Object-oriented, strongly typed, async, nothrow.
 
 ![Build Status](https://img.shields.io/travis/dlebansais/SimpleDatabase/master.svg)
 
 This class library provides access to databases seen as collections and dictionaries of schemas, tables, columns and rows. The object-oriented part appears when one adds custom data types.
 
-The library is strongly typed in that, if a column in contains data of a given type, all C# code using the library manipulate variables of that type, and no `object` or `var` is involved.
+The library is strongly typed in that, if a column contains data of a given type, all C# code using the library manipulate variables of that type, and no `object` or `var` is involved.
 Every operation other than setting up the environment has an xxAsync version that can be plugged to a user interface as any other async method.
 
 When possible, methods of the library will not throw any exception. This doesn't apply to invalid arguments, although some combination of arguments can lead to invalid SQL text but may not be caught when the operation is initiated.
@@ -43,7 +37,7 @@ The code above opens the database and insert a new row with guid value `myguid` 
 
 ## Defining your database
 
-A the core of the library is a database description class for your application. You define your own class, inheriting from `SchemaDescriptor`, and enumerate your tables and columns in the contructor. Below is a simple example, that defines two tables in a schema named *mytest*:
+A the core of the library is a database description class for your application. You define your own class, inheriting from `SchemaDescriptor`, and enumerate your tables and columns in the constructor. Below is a simple example, that defines two tables in a schema named *mytest*:
 
   ```cs
   public class TestSchema : SchemaDescriptor
@@ -85,7 +79,7 @@ The library contains several methods to install the database (though it assumes 
   Database.CreateCredential(RootId, RootPassword, Credential);
   ```
 
-2. The database at this stage is empty (it has no table). Use the CreateTables method to remedy to this situation.
+2. The database at this stage is empty (it has no table). Use the `CreateTables` method to remedy to this situation.
 
   ```cs
   Database.CreateTables(Credential);
@@ -110,11 +104,11 @@ For every run of your application, you need to open a new session:
   Database.Open(Credential);
   ```
 
-## Perfoming operations
+## Performing operations
 
-All operations (queries, update, deleting...) are performed as follow.
+All operations (queries, updating, deleting...) are performed as follow.
 1. You create and fill a context object, for example `QueryContext` (see the [Selecting data](#selecting-data) section for a specific example).
-2. You call the corresponding `Database.Run` method. There is one method per context type, all called `Run`.
+2. You call the corresponding `Database.Run` method. There is one method per context type, all named `Run`.
 3. Alternatively, you call `Database.RunAsync` for asynchronous execution.
 4. When execution is completed, `Run` returns one of the `xxResult` objects, matching the context used. For instance, in the `QueryContext` case, it will return a `IQueryResult` object.
 5. You can inspect the `Success` property of this object, and for query operations the `RowList` property.
@@ -137,8 +131,8 @@ To insert a single row, create an `InsertContext` object, with arguments the lis
   IInsertResult InsertResult = Database.Run(new InsertContext(TestSchema.Test0, new List<IColumnValuePair>() { new ColumnValuePair<Guid>(TestSchema.Test0_Guid, new Guid("{1BA0D7E9-039F-44E6-A966-CC67AC01A65D}")) }));
   ```
 
-To insert more than one row, provide the number of rows you want to insert, and for each of them a `IColumnValueCollectionPair` that will list all values for that row. Note that all value lists must have exactly as many values as rows inserted. If you want to keep some rows without values, you will need a more complicated sequence, for example by inserting each row seperately.
-The following example inserts three rows, with guids `guidKey0`, `guidKey1` and `guidKey2` (not explicited here, for clarity).
+To insert more than one row, provide the number of rows you want to insert, and for each of them a `IColumnValueCollectionPair` that will list all values for that row. Note that all value lists must have exactly as many values as rows inserted. If you want to keep some rows without values, you will need a more complicated sequence, for example by inserting each row separately.
+The following example inserts three rows, with guids `guidKey0`, `guidKey1` and `guidKey2` (not explicit here, for clarity).
 
   ```cs
   IInsertResult InsertResult = Database.Run(new InsertContext(TestSchema.Test0, 3, new List<IColumnValueCollectionPair>() { new ColumnValueCollectionPair<Guid>(TestSchema.Test0_Guid, new List<Guid>() { guidKey0, guidKey1, guidKey2 }), }));
@@ -168,7 +162,7 @@ This time, rows that are updated are those for which *column_guid* is equal to `
 
 ## Deleting rows
 
-Deleting rows has more options. When performing a delete operation, you can set a minimum number of rows to delete for the operation to be considered successful. This can be zero, but typically it can be the number of rows returned by a query targetting specific values. If you use the same targetting object for the delete, the number of rows returned, and the delete is successful, you know all rows have been deleted.
+Deleting rows has more options. When performing a delete operation, you can set a minimum number of rows to delete for the operation to be considered successful. This can be zero, but typically it can be the number of rows returned by a query targeting specific values. If you use the same targeting object for the delete, the number of rows returned, and the delete is successful, you know all rows have been deleted.
 
 Deleting rows also has the following options: 
 
@@ -190,9 +184,9 @@ Deleting rows also has the following options:
   ```
 ## Selecting data
 
-Data query can be done on a single table or on several tables using one or more LEFT JOIN. The single table case is done using a SingleQueryContext object, with a parameter specifying the table to query. In addition, you have two optional parameters that you can mix freely:
+Data query can be done on a single table or on several tables using one or more LEFT JOIN. The single table case is done using a `SingleQueryContext` object, with a parameter specifying the table to query. In addition, you have two optional parameters that you can mix freely:
 
-1. A set of constraints specifying that either one or more colums must have a specific value, or that one column can have any of a collection of values.
+1. A set of constraints specifying that either one or more columns must have a specific value, or that one column can have any of a collection of values.
 2. A set of columns to return.
 
 For example, the following operation queries values of *column_guid* for every rows where *column_int* is `2` or `3`.
@@ -201,16 +195,22 @@ For example, the following operation queries values of *column_guid* for every r
   SelectResult = Database.Run(new SingleQueryContext(TestSchema.Test0, new ColumnValueCollectionPair<int>(TestSchema.Test0_Int, new List<int>() { 2, 3 }), new List<IColumnDescriptor>() { TestSchema.Test0_Guid }));
   ```
 
-To read several tables, use a JoinQueryContext and connect columns of different tables with a dictionary:
+To read several tables, use a `JoinQueryContext` and connect columns of different tables with a dictionary:
 
   ```cs
-  Dictionary<IColumnDescriptor, IColumnDescriptor> Join = new Dictionary<IColumnDescriptor, IColumnDescriptor>()
+  ILeftJoin Join = new LeftJoin(Dictionary<IColumnDescriptor, IColumnDescriptor>()
   {
     { TestSchema.Test1_Int, TestSchema.Test0_Int },
-  };
+  });
   SelectResult = Database.Run(new JoinQueryContext(Join, new List<IColumnDescriptor>() { TestSchema.Test1_String, TestSchema.Test0_Guid }));
   ```
 
 The example above returns values of *column_string* in table *test1*, and *column_guid* in table *test0*, where *column_int* is the same in both tables.
  
+A Join can specify several tables, but very often you will just want to join two tables. For this purpose, the example above can be simplified as follow:
+
+  ```cs
+  ILeftJoin Join = new LeftJoin(TestSchema.Test1_Int, TestSchema.Test0_Int);
+  SelectResult = Database.Run(new JoinQueryContext(Join, new List<IColumnDescriptor>() { TestSchema.Test1_String, TestSchema.Test0_Guid }));
+  ```
 
