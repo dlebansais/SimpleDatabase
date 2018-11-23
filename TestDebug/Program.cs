@@ -51,6 +51,8 @@ namespace TestDebug
             Database.Close();
             Database.DeleteTables(Credential);
             Database.DeleteCredential(RootId, RootPassword, Credential);
+
+            Thread.Sleep(5000);
             Success = Database.IsCredentialValid(Credential);
         }
 
