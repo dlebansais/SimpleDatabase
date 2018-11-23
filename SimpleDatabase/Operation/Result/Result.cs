@@ -38,9 +38,14 @@ namespace Database
         ///     Gets an error code if <see cref="Success"/> is false.
         /// </summary>
         /// <returns>
-        ///     The an error code if <see cref="Success"/> is false.
+        ///     The error code if <see cref="Success"/> is false.
         /// </returns>
         ResultError ErrorCode { get; }
+
+        /// <summary>
+        ///     Gets some traces.
+        /// </summary>
+        string Traces { get; }
     }
     #endregion
 }
@@ -90,6 +95,7 @@ namespace Database.Internal
         public bool IsCompleted { get { return Success || CompletedEvent.WaitOne(0); } }
         public bool Success { get; private set; }
         public ResultError ErrorCode { get; private set; }
+        public string Traces { get; private set; }
         public IAsyncResult AsyncResult { get; }
         #endregion
 
@@ -110,6 +116,13 @@ namespace Database.Internal
         {
             Success = success;
             ErrorCode = errorCode;
+
+#if DEBUG
+#else
+#if TRACE
+            Traces = Debugging.CollectTraces();
+#endif
+#endif
             CompletedEvent.Set();
         }
 
@@ -119,9 +132,9 @@ namespace Database.Internal
         }
 
         private ManualResetEvent CompletedEvent;
-        #endregion
+#endregion
 
-        #region Debugging
+#region Debugging
         public override string ToString()
         {
             if (Success)
@@ -131,6 +144,6 @@ namespace Database.Internal
             else
                 return $"...";
         }
-        #endregion
+#endregion
     }
 }

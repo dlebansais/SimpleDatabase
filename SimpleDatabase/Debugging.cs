@@ -1,6 +1,8 @@
-﻿using System;
-using System.Diagnostics;
+﻿#if TRACE
+using System;
 using System.Runtime.InteropServices;
+#endif
+using System.Diagnostics;
 
 namespace Database.Internal
 {
@@ -34,6 +36,14 @@ namespace Database.Internal
             AccumulatedTraces = null;
 
             throw new ApplicationException(s);
+        }
+
+        public static string CollectTraces()
+        {
+            string s = AccumulatedTraces;
+            AccumulatedTraces = null;
+
+            return s;
         }
 
         private static string AccumulatedTraces;
