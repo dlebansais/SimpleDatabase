@@ -16,8 +16,7 @@ namespace Database.Internal
         {
             Debug.Print(s);
         }
-#else
-#if TRACE
+#elif TRACE
         public static void Print(string s)
         {
             if (AccumulatedTraces == null)
@@ -58,7 +57,6 @@ namespace Database.Internal
         {
             OutputDebugString(s);
         }
-#endif
 #endif
     }
 }

@@ -118,10 +118,8 @@ namespace Database.Internal
             ErrorCode = errorCode;
 
 #if DEBUG
-#else
-#if TRACE
+#elif TRACE
             Traces = Debugging.CollectTraces();
-#endif
 #endif
             CompletedEvent.Set();
         }
@@ -132,9 +130,9 @@ namespace Database.Internal
         }
 
         private ManualResetEvent CompletedEvent;
-#endregion
+        #endregion
 
-#region Debugging
+        #region Debugging
         public override string ToString()
         {
             if (Success)
@@ -144,6 +142,6 @@ namespace Database.Internal
             else
                 return $"...";
         }
-#endregion
+        #endregion
     }
 }

@@ -888,10 +888,8 @@ namespace Database
                     LastCompletionException = null;
 
 #if DEBUG
-#else
-#if TRACE
+#elif TRACE
                     throw e;
-#endif
 #endif
                 }
 
@@ -980,9 +978,9 @@ namespace Database
         private ManualResetEvent ShutdownEvent;
         private IList<IActiveOperation> ActiveOperationTable;
         private Exception LastCompletionException;
-#endregion
+        #endregion
 
-#region Implementation of IDisposable
+        #region Implementation of IDisposable
         /// <summary>
         ///     Releases the unmanaged resources used by the <see cref="SimpleDatabase"/> and optionally releases the managed resources.
         /// </summary>
@@ -1016,6 +1014,6 @@ namespace Database
         {
             Dispose(false);
         }
-#endregion
+        #endregion
     }
 }
