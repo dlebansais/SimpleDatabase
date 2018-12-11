@@ -16,6 +16,7 @@ namespace Database.Internal
     internal class MySqlConnector : DatabaseConnector, IMySqlConnector
     {
         #region Constants
+        private const int ER_BAD_HOST_ERROR = 1042;
         private const int ER_DBACCESS_DENIED_ERROR = 1044;
         private const int ER_ACCESS_DENIED_ERROR = 1045;
         private const int ER_BAD_DB_ERROR = 1049;
@@ -344,6 +345,41 @@ namespace Database.Internal
             catch (Exception e)
             {
                 TraceException(e);
+            }
+        }
+        #endregion
+
+        #region Server
+        public override bool IsServerStarted
+        {
+            get
+            {
+                if (IsOpen)
+                    return true;
+
+                try
+                {
+                    string ConnectionString = "Server=localhost";
+
+                    using (MySqlConnection VerificationConnection = new MySqlConnection(ConnectionString))
+                    {
+                        VerificationConnection.Open();
+                        VerificationConnection.Close();
+                    }
+
+                    return true;
+                }
+                catch (MySqlException e)
+                {
+                    if (e.Number == ER_BAD_HOST_ERROR)
+                        return false;
+                    else
+                        return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
         #endregion

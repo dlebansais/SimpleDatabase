@@ -150,6 +150,14 @@ namespace Database
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
+        ///     Indicates if the database server is started.
+        /// </summary>
+        /// <returns>
+        ///     True if the database server is started. False otherwise.
+        /// </returns>
+        bool IsServerStarted { get; }
+
+        /// <summary>
         ///     Opens a database to perform operations on.
         /// </summary>
         /// <parameters>
@@ -495,6 +503,17 @@ namespace Database
         #endregion
 
         #region Open
+        /// <summary>
+        ///     Indicates if the database server is started.
+        /// </summary>
+        /// <returns>
+        ///     True if the database server is started. False otherwise.
+        /// </returns>
+        public virtual bool IsServerStarted
+        {
+            get { return Connector != null && Connector.IsServerStarted; }
+        }
+
         /// <summary>
         ///     Opens a database to perform operations on.
         /// </summary>

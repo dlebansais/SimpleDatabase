@@ -24,6 +24,7 @@ namespace TestDebug
 
             ISimpleDatabase Database = new SimpleDatabase();
             Database.Initialize(ConnectorType.MySql, ConnectionOption.KeepAlive, true);
+            bool IsServerStarted = Database.IsServerStarted;
 
             ITestSchema TestSchema = new TestSchema(false);
             ICredential Credential = new Credential("localhost", "test", "test", TestSchema);

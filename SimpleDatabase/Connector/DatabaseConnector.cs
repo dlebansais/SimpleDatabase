@@ -10,6 +10,7 @@ namespace Database.Internal
         void DeleteTables(ICredential credential);
         void DeleteCredential(string rootId, string rootPassword, ICredential credential);
 
+        bool IsServerStarted { get; }
         bool Open(ICredential credential);
         bool IsOpen { get; }
         void Close();
@@ -33,6 +34,7 @@ namespace Database.Internal
         public abstract void DeleteTables(ICredential credential);
         public abstract void DeleteCredential(string rootId, string rootPassword, ICredential credential);
 
+        public abstract bool IsServerStarted { get; }
         public abstract bool IsOpen { get; }
         public abstract bool Open(ICredential credential);
         public abstract void Close();
