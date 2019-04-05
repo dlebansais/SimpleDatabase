@@ -1003,6 +1003,11 @@ namespace Database.Internal
                 ExecuteCommand(rootConnection, CommandString);
             }
         }
+
+        public override string ToString()
+        {
+            return $"MSql {ServerVersion}, open: {IsOpen}, last error: {LastErrorCode}";
+        }
         #endregion
     }
 }

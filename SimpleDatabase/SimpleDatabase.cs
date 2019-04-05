@@ -992,6 +992,15 @@ namespace Database
             }
         }
 
+        /// <summary>
+        /// Returns the current instance as a string.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return Connector != null ? Connector.ToString() : "<No connector>";
+        }
+
         private Thread OperationThread;
         private AutoResetEvent NewOperationEvent;
         private ManualResetEvent ShutdownEvent;
