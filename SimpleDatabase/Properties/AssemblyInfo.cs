@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SimpleDatabase")]
-[assembly: AssemblyCopyright("Copyright ©  2019 David Le Bansais")]
+[assembly: AssemblyCopyright("Copyright © 2019 David Le Bansais")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
