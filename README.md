@@ -1,7 +1,7 @@
 # Simple Database
 A C# layer over MySql for basic operations. Object-oriented, strongly typed, async, nothrow.
 
-![Build Status](https://img.shields.io/travis/dlebansais/SimpleDatabase/master.svg)
+[![Build Status](https://travis-ci.com/dlebansais/SimpleDatabase.svg?branch=master)](https://travis-ci.com/dlebansais/SimpleDatabase)
 
 This class library provides access to databases seen as collections and dictionaries of schemas, tables, columns and rows. The object-oriented part appears when one adds custom data types.
 
