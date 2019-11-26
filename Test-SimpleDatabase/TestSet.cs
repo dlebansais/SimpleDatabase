@@ -133,7 +133,7 @@ namespace Test
             Assert.That(!Database.IsCredentialValid(Credential), "Verify Credential 2");
             Success = isAsync == 0 ? Database.CreateCredential(RootId, RootPassword, Credential) : await Database.CreateCredentialAsync(RootId, RootPassword, Credential);
             Wait(isAsync);
-            Assert.That(Success, "Verify Credential 3");
+            Assert.That(Success, $"Verify Credential 3 (isAsync: {isAsync}, RootId: {RootId}, RootPassword: {RootPassword})");
 
             Success = isAsync == 0 ? Database.IsCredentialValid(Credential) : await Database.IsCredentialValidAsync(Credential);
             Wait(isAsync);
@@ -171,7 +171,7 @@ namespace Test
             Database.Initialize(ConnectorType, ConnectionOption);
             Success = isAsync == 0 ? Database.CreateCredential(RootId, RootPassword, Credential) : await Database.CreateCredentialAsync(RootId, RootPassword, Credential);
             Wait(isAsync);
-            Assert.That(Success, "Create Tables 2");
+            Assert.That(Success, $"Create Tables 2 (isAsync: {isAsync}, RootId: {RootId}, RootPassword: {RootPassword})");
             Success = isAsync == 0 ? Database.CreateTables(Credential) : await Database.CreateTablesAsync(Credential);
             Wait(isAsync);
             Assert.That(Success, "Create Tables 3");
@@ -214,7 +214,7 @@ namespace Test
             Database.Initialize(ConnectorType, ConnectionOption);
             Success = isAsync == 0 ? Database.CreateCredential(RootId, RootPassword, Credential) : await Database.CreateCredentialAsync(RootId, RootPassword, Credential);
             Wait(isAsync);
-            Assert.That(Success, "Open 2");
+            Assert.That(Success, $"Open 2 (isAsync: {isAsync}, RootId: {RootId}, RootPassword: {RootPassword})");
             Success = isAsync == 0 ? Database.CreateTables(Credential) : await Database.CreateTablesAsync(Credential);
             Wait(isAsync);
             Assert.That(Success, "Open 3");
@@ -271,7 +271,7 @@ namespace Test
             Database.Initialize(ConnectorType, ConnectionOption);
             Success = isAsync == 0 ? Database.CreateCredential(RootId, RootPassword, Credential) : await Database.CreateCredentialAsync(RootId, RootPassword, Credential);
             Wait(isAsync);
-            Assert.That(Success, "Delete Non Empty 2");
+            Assert.That(Success, $"Delete Non Empty 2 (isAsync: {isAsync}, RootId: {RootId}, RootPassword: {RootPassword})");
             Success = isAsync == 0 ? Database.CreateTables(Credential) : await Database.CreateTablesAsync(Credential);
             Wait(isAsync);
             Assert.That(Success, "Delete Non Empty 3");
