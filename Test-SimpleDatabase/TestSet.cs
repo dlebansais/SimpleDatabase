@@ -36,18 +36,7 @@ namespace Test
             }
             Assume.That(SimpleDatabaseAssembly != null);
 
-            if (File.Exists("passwords.txt"))
-            {
-                using (FileStream fs = new FileStream("passwords.txt", FileMode.Open, FileAccess.Read))
-                {
-                    using (StreamReader sr = new StreamReader(fs))
-                    {
-                        RootId = sr.ReadLine();
-                        RootPassword = sr.ReadLine();
-                    }
-                }
-            }
-            else
+            if (!LoadPassword("./passwords.txt") && !LoadPassword("./Test-SimpleDatabase/passwords.txt"))
             {
                 RootId = "root";
                 RootPassword = "";
@@ -64,6 +53,25 @@ namespace Test
             catch
             {
             }
+        }
+
+        private static bool LoadPassword(string fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                {
+                    using (StreamReader sr = new StreamReader(fs))
+                    {
+                        RootId = sr.ReadLine();
+                        RootPassword = sr.ReadLine();
+
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static string RootId;
