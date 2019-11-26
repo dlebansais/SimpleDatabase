@@ -81,9 +81,9 @@ namespace Test
         private static string Server = "localhost";
         private static string UserId = "test";
         private static string UserPassword = "test";
-#endregion
+        #endregion
 
-#region Init
+        #region Init
         [Test]
         public static void TestInitCredential()
         {
@@ -356,9 +356,9 @@ namespace Test
 
             Thread.Sleep(1000);
         }
-#endregion
+        #endregion
 
-#region Tools
+        #region Tools
         private static Guid guidKey0 = new Guid("{1BA0D7E9-039F-44E6-A966-CC67AC01A65D}");
         private static Guid guidKey1 = new Guid("{2FA55A73-0311-4818-8B34-1492308ADBF1}");
         private static Guid guidKey2 = new Guid("{16DC914E-CDED-41DD-AE23-43B62676159D}");
@@ -410,9 +410,9 @@ namespace Test
 
             Thread.Sleep(1000);
         }
-#endregion
+        #endregion
 
-#region Queries
+        #region Queries
         [Test]
         [TestCase(0)]
         [TestCase(1)]
@@ -522,6 +522,8 @@ namespace Test
             TestSchema TestSchema;
             InstallDatabase(TestName, false, out ICredential Credential, out ISimpleDatabase Database, out TestSchema);
 
+            TestContext.Out.WriteLine("Database installed");
+
             IInsertResult InsertResult;
             IJoinQueryResult JoinSelectResult;
             List<IResultRow> RowList;
@@ -533,6 +535,8 @@ namespace Test
             Wait(isAsync);
             Assert.That(InsertResult.Success, $"{TestName} - 0: Insert first 3 keys ({InsertResult.ErrorCode})");
 
+            TestContext.Out.WriteLine("Insert #1 completed");
+
             if (isAsync == 0)
                 JoinSelectResult = Database.Run(new JoinQueryContext(TestSchema.Test0.All));
             else
@@ -540,6 +544,8 @@ namespace Test
             Wait(isAsync);
             Assert.That(JoinSelectResult.Success, $"{TestName} - 0: Read table ({JoinSelectResult.ErrorCode})");
             Assert.That(JoinSelectResult.RowList != null, $"{TestName} - 0: Read table result");
+
+            TestContext.Out.WriteLine("Select #1 completed");
 
             // Columns are reordered by Guid
             RowList = new List<IResultRow>(JoinSelectResult.RowList);
@@ -558,6 +564,8 @@ namespace Test
             Wait(isAsync);
             Assert.That(InsertResult.Success, $"{TestName} - 1: Insert first row ({InsertResult.ErrorCode} ... {InsertResult.Traces})");
 
+            TestContext.Out.WriteLine("Insert #2 completed");
+
             if (isAsync == 0)
                 JoinSelectResult = Database.Run(new JoinQueryContext(TestSchema.Test1.All));
             else
@@ -565,6 +573,8 @@ namespace Test
             Wait(isAsync);
             Assert.That(JoinSelectResult.Success, $"{TestName} - 1: Read table ({JoinSelectResult.ErrorCode})");
             Assert.That(JoinSelectResult.RowList != null, $"{TestName} - 1: Read table result");
+
+            TestContext.Out.WriteLine("Select #2 completed");
 
             RowList = new List<IResultRow>(JoinSelectResult.RowList);
             Assert.That(RowList != null && RowList.Count == 3, $"{TestName} - 1: Count rows ({RowList.Count})");
@@ -576,6 +586,8 @@ namespace Test
             Assert.That(TestSchema.Test1_String.TryParseRow(RowList[2], out string Test1_Row_2_1) && Test1_Row_2_1 == "row 2", $"{TestName} - 2: Check row 2, column 2");
 
             UninstallDatabase(TestName, ref Credential, ref Database, ref TestSchema);
+
+            TestContext.Out.WriteLine("Database uninstalled");
         }
 
         [Test]
@@ -920,9 +932,9 @@ namespace Test
 
             UninstallDatabase(TestName, ref Credential, ref Database, ref TestSchema);
         }
-#endregion
+        #endregion
 
-#region DateTime
+        #region DateTime
         [Test]
         [TestCase(0)]
         [TestCase(1)]
@@ -967,6 +979,6 @@ namespace Test
 
             UninstallDatabase(TestName, ref Credential, ref Database, ref TestSchema);
         }
-#endregion
+        #endregion
     }
 }
