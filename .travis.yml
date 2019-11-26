@@ -11,6 +11,9 @@ script:
 - msbuild /p:Configuration=Travis /p:Platform=x64 SimpleDatabase.sln
 - mono ./testrunner/NUnit.ConsoleRunner.3.10.0/tools/nunit3-console.exe --trace=Debug --labels=All ./Test-SimpleDatabase/bin/x64/Travis/Test-SimpleDatabase.dll
 
+services:
+  - mysql
+
 deploy:
   provider: pages
   skip_cleanup: true
