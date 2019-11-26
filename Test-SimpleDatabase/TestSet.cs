@@ -36,7 +36,9 @@ namespace Test
             }
             Assume.That(SimpleDatabaseAssembly != null);
 
+#if !TRAVIS
             if (!LoadPassword("./passwords.txt") && !LoadPassword("./Test-SimpleDatabase/passwords.txt"))
+#endif
             {
                 RootId = "root";
                 RootPassword = "";
@@ -79,9 +81,9 @@ namespace Test
         private static string Server = "localhost";
         private static string UserId = "test";
         private static string UserPassword = "test";
-        #endregion
+#endregion
 
-        #region Init
+#region Init
         [Test]
         public static void TestInitCredential()
         {
@@ -354,9 +356,9 @@ namespace Test
 
             Thread.Sleep(1000);
         }
-        #endregion
+#endregion
 
-        #region Tools
+#region Tools
         private static Guid guidKey0 = new Guid("{1BA0D7E9-039F-44E6-A966-CC67AC01A65D}");
         private static Guid guidKey1 = new Guid("{2FA55A73-0311-4818-8B34-1492308ADBF1}");
         private static Guid guidKey2 = new Guid("{16DC914E-CDED-41DD-AE23-43B62676159D}");
@@ -408,9 +410,9 @@ namespace Test
 
             Thread.Sleep(1000);
         }
-        #endregion
+#endregion
 
-        #region Queries
+#region Queries
         [Test]
         [TestCase(0)]
         [TestCase(1)]
@@ -918,9 +920,9 @@ namespace Test
 
             UninstallDatabase(TestName, ref Credential, ref Database, ref TestSchema);
         }
-        #endregion
+#endregion
 
-        #region DateTime
+#region DateTime
         [Test]
         [TestCase(0)]
         [TestCase(1)]
@@ -965,6 +967,6 @@ namespace Test
 
             UninstallDatabase(TestName, ref Credential, ref Database, ref TestSchema);
         }
-        #endregion
+#endregion
     }
 }
